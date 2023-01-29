@@ -1,0 +1,33 @@
+{
+  "extends": "fastify-tsconfig",
+  "compilerOptions": {
+    "sourceMap": true,
+    "outDir": "./dist",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "paths": {
+      "constants": ["./constants"],
+      "constants/*": ["./constants/*"],
+      "types": ["./types"],
+      "types/*": ["./types/*"],
+      "utils": ["./utils"],
+      "utils/*": ["./utils/*"],
+      "test": ["./test"],
+      "test/*": ["./test/*"],
+      "typechain-types": ["./typechain-types"],
+      "typechain-types/*": ["./typechain-types/*"]
+    }
+  },
+  "exclude": ["node_modules"],
+  "files": ["./hardhat.config.ts"],
+  "include": ["src/**/*", "tasks/**/*", "test/**/*", "deploy/**/*"]
+}
