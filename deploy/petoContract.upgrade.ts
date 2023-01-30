@@ -15,7 +15,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     } = hre;
     const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks];
 
-    console.log(`PetoContract [${contractAddress}] is upgrading...`);
+    console.log(`PetoContract ${contractAddress} is upgrading...`);
 
     const petoContractFactory = <PetoContract__factory>(
       await ethers.getContractFactory("PetoContract")

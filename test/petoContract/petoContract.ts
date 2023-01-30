@@ -3,6 +3,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { ethers } from "hardhat";
 
 import { shouldBehaveCorrectFetching } from "./petoContract.behavior.fetching";
+import { shouldBehaveCorrectMinting } from "./petoContract.behavior.minting";
 import { deployPetoContractFixture } from "./petoContract.fixture";
 
 describe("PetoContract", function () {
@@ -26,4 +27,5 @@ describe("PetoContract", function () {
   });
 
   shouldBehaveCorrectFetching();
+  shouldBehaveCorrectMinting();
 });

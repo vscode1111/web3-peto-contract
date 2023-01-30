@@ -12,30 +12,38 @@ interface IMetadata {
   description: string;
 }
 
-const CONTRACT_NAME = `carbar_test_${deployValue.nftPostfix}`;
+const CONTRACT_NAME = `erc721_test_${deployValue.nftPostfix}`;
 
 const DICTIONARY: Record<string | number, IMetadata> = {
-  contract: {
-    name: CONTRACT_NAME,
-    image:
-      "https://shiftdelete.net/wp-content/uploads/2022/02/tesla-uygulama-magazasi-bu-yil-tanitabilir1.jpg",
-    banner: "https://cdn.webrazzi.com/uploads/2015/09/tesla-model-x3.jpg",
-    description: `${CONTRACT_NAME} description`,
-  },
   0: {
-    name: "TEST Model Stnd",
-    image: "https://carbar.io/nft/Tesla_Model_3_Stnd.png",
-    description: `TEST Model Stn test description. ${CONTRACT_NAME}`,
+    name: "Token 0",
+    image:
+      "https://images.pexels.com/photos/7788009/pexels-photo-7788009.jpeg?auto=compress&cs=tinysrgb&w=400",
+    description: `Token 0 test description. ${CONTRACT_NAME}`,
   },
   1: {
-    name: "TEST Model Prfm",
-    image: "https://carbar.io/nft/Tesla_Model_3_Prfm.png",
-    description: `TEST Model Prfm test description. ${CONTRACT_NAME}`,
+    name: "Token 1",
+    image:
+      "https://images.pexels.com/photos/844125/pexels-photo-844125.jpeg?auto=compress&cs=tinysrgb&w=400",
+    description: `Token 1 test description. ${CONTRACT_NAME}`,
   },
   2: {
-    name: "TEST Model Y",
-    image: "https://carbar.io/nft/Tesla_Y.png",
-    description: `TEST Model Y test description. ${CONTRACT_NAME}`,
+    name: "Token 2",
+    image:
+      "https://images.pexels.com/photos/844127/pexels-photo-844127.jpeg?auto=compress&cs=tinysrgb&w=400",
+    description: `Token 2 test description. ${CONTRACT_NAME}`,
+  },
+  3: {
+    name: "Token 3",
+    image:
+      "https://images.pexels.com/photos/843700/pexels-photo-843700.jpeg?auto=compress&cs=tinysrgb&w=400",
+    description: `Token 3 test description. ${CONTRACT_NAME}`,
+  },
+  4: {
+    name: "Token 4",
+    image:
+      "https://images.pexels.com/photos/315788/pexels-photo-315788.jpeg?auto=compress&cs=tinysrgb&w=400",
+    description: `Token 3 test description. ${CONTRACT_NAME}`,
   },
 };
 
