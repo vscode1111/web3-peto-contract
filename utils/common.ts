@@ -78,3 +78,40 @@ export async function callWithTimer(
     : `<-Function was finished at ${finishTime.toLocaleTimeString()} in ${diff} sec${extText}`;
   console.log(finishMessage);
 }
+
+export async function delay(ms: number): Promise<number> {
+  // eslint-disable-next-line no-promise-executor-return
+  return new Promise((resolve: any) => setTimeout(resolve, ms));
+}
+
+export async function verifyContract(
+  address: string,
+  contractPath: string,
+  hre: HardhatRuntimeEnvironment,
+  args?: unknown,
+): Promise<void> {
+  let count = 0;
+  const maxTries = 5;
+
+  while (count < maxTries) {
+    try {
+      console.log("Verifying contract at", address);
+
+      await hre.run("verify:verify", {
+        address: address,
+        constructorArguments: args,
+        contract: contractPath, // "contracts/lp-oracle-contracts/mock/Token.sol:Token",
+      });
+      return;
+    } catch (error) {
+      count += 1;
+
+      await delay(5000);
+    }
+  }
+
+  if (count === maxTries) {
+    console.log("Failed to verify contract at path %s at address %s", address);
+    throw new Error("Verification failed");
+  }
+}

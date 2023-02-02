@@ -3,6 +3,7 @@ export const testValue = {
   symbol: "Symbol_b01",
   uri: "https://test.com/",
   tokenCount: 5,
+  tokenId: 0,
 };
 
 export const errorMessage = {

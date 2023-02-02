@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 
 import { shouldBehaveCorrectFetching } from "./petoContract.behavior.fetching";
 import { shouldBehaveCorrectMinting } from "./petoContract.behavior.minting";
+import { shouldBehaveCorrectTransferring } from "./petoContract.behavior.transferring";
 import { deployPetoContractFixture } from "./petoContract.fixture";
 
 describe("PetoContract", function () {
@@ -28,4 +29,5 @@ describe("PetoContract", function () {
 
   shouldBehaveCorrectFetching();
   shouldBehaveCorrectMinting();
+  shouldBehaveCorrectTransferring();
 });

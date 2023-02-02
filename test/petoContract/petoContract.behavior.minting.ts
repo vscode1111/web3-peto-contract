@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { testValue } from "test/testData";
+import { initCollectionsReal as initCollections } from "test/utils";
 
 export function shouldBehaveCorrectMinting(): void {
   describe("minting", () => {
@@ -24,10 +25,18 @@ export function shouldBehaveCorrectMinting(): void {
       expect(await this.adminPetoContract.tokenURI(1)).to.equal(`${testValue.uri}1.json`);
     });
 
-    it("should to call createTokens correctly", async function () {
-      await this.adminPetoContract.setURI(testValue.uri);
+    it("should call createTokens correctly", async function () {
+      await initCollections(this.adminPetoContract);
 
-      await this.adminPetoContract.createTokens(testValue.tokenCount);
+      expect(await this.adminPetoContract.balanceOf(this.admin.address)).to.equal(
+        testValue.tokenCount,
+      );
+      expect(await this.adminPetoContract.ownerOf(0)).to.equal(this.admin.address);
+      expect(await this.adminPetoContract.ownerOf(1)).to.equal(this.admin.address);
+      expect(await this.adminPetoContract.ownerOf(2)).to.equal(this.admin.address);
+      expect(await this.adminPetoContract.ownerOf(3)).to.equal(this.admin.address);
+      expect(await this.adminPetoContract.ownerOf(4)).to.equal(this.admin.address);
+
       const tokens = await this.adminPetoContract.fetchTokens();
       expect(tokens.length).to.equal(testValue.tokenCount);
       expect(tokens[0].tokenId).to.equal(0);

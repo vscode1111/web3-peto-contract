@@ -17,6 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const petoContract = <PetoContract>await upgrades.deployProxy(
       petoContractFactory,
       [deployValue.name, deployValue.symbol],
+      // [],
       {
         initializer: "initialize",
         kind: "uups",

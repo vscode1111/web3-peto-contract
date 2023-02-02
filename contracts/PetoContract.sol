@@ -8,10 +8,26 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+
+import "hardhat/console.sol";
 
 contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using StringsUpgradeable for uint256;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(string memory name_, string memory symbol_) public initializer {
+        __ERC721_init(name_, symbol_);
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     CountersUpgradeable.Counter private _tokenIdCounter;
 
@@ -24,19 +40,6 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, U
         address owner;
     }
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(string memory name, string memory symbol) public initializer {
-        __ERC721_init(name, symbol);
-        __Ownable_init();
-        __UUPSUpgradeable_init();
-    }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-
     function safeMint(address to) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         CreateItem(uint32(tokenId), to);
@@ -44,14 +47,13 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, U
         _safeMint(to, tokenId);
     }
 
-    function CreateItem(uint32 tokenId, address owner) private onlyOwner {
-        _tokenItems[tokenId] = TokenItem(tokenId, owner);
+    function CreateItem(uint32 tokenId, address owner_) private onlyOwner {
+        _tokenItems[tokenId] = TokenItem(tokenId, owner_);
     }
 
     function createTokens(uint32 tokenCount) external onlyOwner {
-        address owner = _msgSender();
         for (uint32 i = 0; i < tokenCount; i++) {
-            safeMint(owner);
+            safeMint(_msgSender());
         }
     }
 
@@ -62,6 +64,31 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, U
             tokens[i] = _tokenItems[i];
         }
         return tokens;
+    }
+
+    function fetchToken(uint32 tokenId) public view returns (TokenItem memory) {
+        return _tokenItems[tokenId];
+    }
+
+    function getTokenCount() public view returns (uint32) {
+        return uint32(_tokenIdCounter.current());
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override {
+        TokenItem storage token = _tokenItems[uint32(tokenId)];
+        token.owner = to;
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public virtual override {
+        TokenItem storage token = _tokenItems[uint32(tokenId)];
+        token.owner = to;
+        super.safeTransferFrom(from, to, tokenId, data);
     }
 
     function setURI(string memory uri) external onlyOwner {

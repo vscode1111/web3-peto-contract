@@ -1,8 +1,19 @@
 import { expect } from "chai";
+import { PetoContract } from "typechain-types/contracts/PetoContract";
 import { StringNumber } from "types/common";
+
+import { testValue } from "./testData";
 
 export function getCollectionName(name: StringNumber) {
   return `collection ${name}`;
+}
+
+export async function initCollectionsReal(
+  petoContract: PetoContract,
+  tokenCount = testValue.tokenCount,
+) {
+  await petoContract.setURI(testValue.uri);
+  await petoContract.createTokens(tokenCount);
 }
 
 export async function expectThrowsAsync(method: () => Promise<any>, errorMessage: string) {

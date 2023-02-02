@@ -13,7 +13,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
       ethers,
       network: { name },
     } = hre;
-    const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks];
+    const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks] as string;
 
     console.log(`PetoContract ${contractAddress} is upgrading...`);
 

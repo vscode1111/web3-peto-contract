@@ -20,28 +20,25 @@ if (!providerUrl) {
 }
 
 const adminPrivateKey = `0x${process.env.ADMIN_PRIVATE_KEY}`;
-if (adminPrivateKey.length < 3) {
+if (adminPrivateKey.length < 20) {
   throw new Error("Please set your ADMIN_PRIVATE_KEY in a .env file");
 }
-const userPrivateKey = `0x${process.env.USER_PRIVATE_KEY}`;
-if (userPrivateKey.length < 3) {
-  throw new Error("Please set your USER_PRIVATE_KEY in a .env file");
-}
-
 function getChainConfig(): NetworkUserConfig {
   return {
     url: providerUrl,
-    accounts: [adminPrivateKey, userPrivateKey],
+    accounts: [adminPrivateKey],
   };
 }
 
 const config: HardhatUserConfig = {
-  // defaultNetwork: "mumbai",
+  // defaultNetwork: "opera",
   defaultNetwork: "polygon",
   etherscan: {
     apiKey: {
-      polygon: process.env.POLYGONSCAN_API_KEY || "",
+      opera: process.env.FANTOMSCAN_API_KEY || "",
+      bsc: process.env.BSCSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
+      polygon: process.env.POLYGONSCAN_API_KEY || "",
     },
   },
   gasReporter: {
@@ -51,8 +48,10 @@ const config: HardhatUserConfig = {
     src: "./contracts",
   },
   networks: {
-    polygon: getChainConfig(),
+    opera: getChainConfig(),
+    bsc: getChainConfig(),
     mumbai: getChainConfig(),
+    polygon: getChainConfig(),
   },
   paths: {
     artifacts: "./artifacts",
