@@ -1,10 +1,10 @@
-import { CONTRACTS } from "constants/addresses";
+import { CONTRACTS, contractName } from "constants/addresses";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { PetoContract } from "typechain-types/contracts/PetoContract";
 import { PetoContract__factory } from "typechain-types/factories/contracts/PetoContract__factory";
 import { DeployNetworks } from "types/common";
-import { callWithTimer } from "utils/common";
+import { callWithTimer, waitForTx } from "utils/common";
 
 import { deployValue } from "./deployData";
 
@@ -19,28 +19,29 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     } = hre;
     const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks] as string;
 
-    console.log(`PetoContract ${contractAddress} is initiating...`);
+    console.log(`${contractName} ${contractAddress} is initiating...`);
 
     const [admin] = await hre.ethers.getSigners();
 
-    const petoContractFactory = <PetoContract__factory>(
-      await ethers.getContractFactory("PetoContract")
-    );
+    const contractFactory = <PetoContract__factory>await ethers.getContractFactory(contractName);
 
-    const adminPetoContract = <PetoContract>(
-      await petoContractFactory.connect(admin).attach(contractAddress)
+    const adminContract = <PetoContract>(
+      await contractFactory.connect(admin).attach(contractAddress)
     );
 
     console.log(`Setting init values...`);
-    await (await adminPetoContract.safeMint(admin.address)).wait();
-    await (await adminPetoContract.setURI(`${HOST_URL}/${deployValue.nftPostfix}/`)).wait();
+    await waitForTx(adminContract.setURI(`${HOST_URL}/${deployValue.nftPostfix}/`), "setURI");
+
     if (INIT_COLLECTION) {
-      await (await adminPetoContract.createTokens(deployValue.tokenCount)).wait();
+      await waitForTx(
+        adminContract.createTokens(deployValue.tokenCount),
+        `createTokens (${deployValue.tokenCount})`,
+      );
     }
     console.log(`Init values were set`);
   }, hre);
 };
 
-func.tags = ["PetoContract:init"];
+func.tags = [`${contractName}:init`];
 
 export default func;

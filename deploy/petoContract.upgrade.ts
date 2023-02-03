@@ -1,11 +1,10 @@
-import { CONTRACTS } from "constants/addresses";
+import { CONTRACTS, contractName } from "constants/addresses";
 import { upgrades } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { PetoContract } from "typechain-types/contracts/PetoContract";
 import { PetoContract__factory } from "typechain-types/factories/contracts/PetoContract__factory";
 import { DeployNetworks } from "types/common";
-import { callWithTimer } from "utils/common";
+import { callWithTimer, verifyContract } from "utils/common";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimer(async () => {
@@ -15,15 +14,14 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     } = hre;
     const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks] as string;
 
-    console.log(`PetoContract ${contractAddress} is upgrading...`);
+    console.log(`${contractName} ${contractAddress} is upgrading...`);
 
-    const petoContractFactory = <PetoContract__factory>(
-      await ethers.getContractFactory("PetoContract")
-    );
-    <PetoContract>await upgrades.upgradeProxy(contractAddress, petoContractFactory);
+    const contractFactory = <PetoContract__factory>await ethers.getContractFactory(contractName);
+    await upgrades.upgradeProxy(contractAddress, contractFactory);
+    await verifyContract(contractAddress, hre);
   }, hre);
 };
 
-func.tags = ["PetoContract:upgrade"];
+func.tags = [`${contractName}:upgrade`];
 
 export default func;

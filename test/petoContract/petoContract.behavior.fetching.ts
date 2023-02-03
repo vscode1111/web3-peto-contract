@@ -23,7 +23,7 @@ export function shouldBehaveCorrectFetching(): void {
       expect(token.tokenId).to.equal(testValue.tokenId);
       expect(token.owner).to.equal(this.admin.address);
     });
-    it.only("should call getTokenCount correctly", async function () {
+    it("should call getTokenCount correctly", async function () {
       await initCollectionsReal(this.adminPetoContract);
       // console.log(111, testValue.tokenCount);
       expect(await this.adminPetoContract.getTokenCount()).to.equal(testValue.tokenCount);

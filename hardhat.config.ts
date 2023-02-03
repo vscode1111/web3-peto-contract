@@ -35,10 +35,10 @@ const config: HardhatUserConfig = {
   defaultNetwork: "polygon",
   etherscan: {
     apiKey: {
+      polygon: process.env.POLYGONSCAN_API_KEY || "",
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
       opera: process.env.FANTOMSCAN_API_KEY || "",
       bsc: process.env.BSCSCAN_API_KEY || "",
-      polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
-      polygon: process.env.POLYGONSCAN_API_KEY || "",
     },
   },
   gasReporter: {
@@ -48,10 +48,10 @@ const config: HardhatUserConfig = {
     src: "./contracts",
   },
   networks: {
+    polygon: getChainConfig(),
+    mumbai: getChainConfig(),
     opera: getChainConfig(),
     bsc: getChainConfig(),
-    mumbai: getChainConfig(),
-    polygon: getChainConfig(),
   },
   paths: {
     artifacts: "./artifacts",

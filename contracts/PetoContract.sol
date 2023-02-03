@@ -12,7 +12,8 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 import "hardhat/console.sol";
 
-contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
+// contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
+contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using StringsUpgradeable for uint256;
 
@@ -24,10 +25,7 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, U
     function initialize(string memory name_, string memory symbol_) public initializer {
         __ERC721_init(name_, symbol_);
         __Ownable_init();
-        __UUPSUpgradeable_init();
     }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     CountersUpgradeable.Counter private _tokenIdCounter;
 
@@ -74,7 +72,7 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, U
         return uint32(_tokenIdCounter.current());
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override {
+    function safeTransferFrom(address from, address to, uint256 tokenId) public virtual override {
         TokenItem storage token = _tokenItems[uint32(tokenId)];
         token.owner = to;
         super.safeTransferFrom(from, to, tokenId);

@@ -1,5 +1,5 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { BigNumber, BigNumberish } from "ethers";
+import { BigNumber, BigNumberish, ContractTransaction } from "ethers";
 import { ethers } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { StringNumber } from "types/common";
@@ -68,7 +68,7 @@ export async function callWithTimer(
   if (hre && admin && balance0) {
     balance1 = toNumber(await admin.getBalance());
     diffBalance = balance0 - balance1;
-    extText = `, balance: ${balance1.toFixed(FRACTION_DIGITS)}, diff: -${diffBalance.toFixed(
+    extText = `, balance: ${balance1.toFixed(FRACTION_DIGITS)}, cost: ${diffBalance.toFixed(
       FRACTION_DIGITS,
     )}`;
   }
@@ -86,7 +86,6 @@ export async function delay(ms: number): Promise<number> {
 
 export async function verifyContract(
   address: string,
-  contractPath: string,
   hre: HardhatRuntimeEnvironment,
   args?: unknown,
 ): Promise<void> {
@@ -95,12 +94,10 @@ export async function verifyContract(
 
   while (count < maxTries) {
     try {
-      console.log("Verifying contract at", address);
-
+      console.log(`=>Attempt #${count + 1} to verifying contract at ${address}...`);
       await hre.run("verify:verify", {
         address: address,
         constructorArguments: args,
-        contract: contractPath, // "contracts/lp-oracle-contracts/mock/Token.sol:Token",
       });
       return;
     } catch (error) {
@@ -114,4 +111,22 @@ export async function verifyContract(
     console.log("Failed to verify contract at path %s at address %s", address);
     throw new Error("Verification failed");
   }
+}
+
+export async function waitForTx(
+  promise: Promise<ContractTransaction>,
+  functionName?: string,
+  // confirmations = 1
+): Promise<ContractTransaction> {
+  if (functionName) {
+    console.log(`TX: calling ${functionName}...`);
+  }
+  return promise.then((tx) => {
+    if (functionName) {
+      console.log(`TX: waiting ${functionName}...`);
+    }
+    // tx.wait(confirmations);
+    tx.wait();
+    return tx;
+  });
 }

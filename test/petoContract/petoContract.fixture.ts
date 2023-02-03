@@ -11,13 +11,8 @@ export async function deployPetoContractFixture(): Promise<ContextBase> {
   const PetoContractFactory = <PetoContract__factory>(
     await ethers.getContractFactory("PetoContract")
   );
-  const adminPetoContract = <PetoContract>await upgrades.deployProxy(
-    PetoContractFactory,
-    [testValue.name, testValue.symbol],
-    {
-      initializer: "initialize",
-      kind: "uups",
-    },
+  const adminPetoContract = <PetoContract>(
+    await upgrades.deployProxy(PetoContractFactory, [testValue.name, testValue.symbol])
   );
   await adminPetoContract.deployed();
 

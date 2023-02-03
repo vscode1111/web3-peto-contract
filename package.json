@@ -11,6 +11,7 @@
     "deploy": "hardhat deploy",
     "deploy:accounts": "hardhat deploy --tags accounts",
     "deploy:proxy": "hardhat deploy --tags PetoContract:proxy",
+    "deploy:verify": "hardhat deploy --tags PetoContract:verify",
     "deploy:init": "hardhat deploy --tags PetoContract:init",
     "deploy:upgrade": "hardhat deploy --tags PetoContract:upgrade",
     "deploy:transfer": "hardhat deploy --tags PetoContract:transfer",
