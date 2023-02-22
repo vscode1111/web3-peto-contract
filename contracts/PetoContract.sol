@@ -96,4 +96,8 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         return string.concat(_uri, tokenId.toString(), ".json");
     }
+
+    function contractURI() public view returns (string memory) {
+        return string.concat(_uri, "contract.json");
+    }
 }

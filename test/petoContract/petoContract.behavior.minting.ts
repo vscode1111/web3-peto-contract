@@ -4,8 +4,9 @@ import { initCollectionsReal as initCollections } from "test/utils";
 
 export function shouldBehaveCorrectMinting(): void {
   describe("minting", () => {
-    it("should procced the minting", async function () {
+    it.only("should procced the minting", async function () {
       await this.adminPetoContract.setURI(testValue.uri);
+      expect(await this.adminPetoContract.contractURI()).to.equal(`${testValue.uri}contract.json`);
 
       await this.adminPetoContract.safeMint(this.admin.address);
       let tokens = await this.adminPetoContract.fetchTokens();

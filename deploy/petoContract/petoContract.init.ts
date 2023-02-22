@@ -6,7 +6,11 @@ import { PetoContract__factory } from "typechain-types/factories/contracts/PetoC
 import { DeployNetworks } from "types/common";
 import { callWithTimer, waitForTx } from "utils/common";
 
-import { deployValue } from "./deployData";
+import { deployValue } from "../deployData";
+
+//const HOST_URL = "https://petobots.io/nft/json/1/";
+const HOST_URL = "https://petobots.io/nft/json/2/";
+const INIT_COLLECTION = true;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimer(async () => {
@@ -16,7 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     } = hre;
     const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks] as string;
 
-    console.log(`${CONTRACT_NAME} ${contractAddress} starts transfering...`);
+    console.log(`${CONTRACT_NAME} ${contractAddress} is initiating...`);
 
     const [admin] = await hre.ethers.getSigners();
 
@@ -26,18 +30,19 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
       await contractFactory.connect(admin).attach(contractAddress)
     );
 
-    await waitForTx(
-      // adminContract.safeTransferFrom(admin.address, deployValue.userAddress, deployValue.tokenId),
-      adminContract["safeTransferFrom(address,address,uint256)"](
-        admin.address,
-        deployValue.userAddress,
-        deployValue.tokenId,
-      ),
-      `safeTransferFrom`,
-    );
+    console.log(`Setting init values...`);
+    // await waitForTx(adminContract.setURI(HOST_URL), "setURI");
+
+    if (INIT_COLLECTION) {
+      await waitForTx(
+        adminContract.createTokens(deployValue.tokenCount),
+        `createTokens (${deployValue.tokenCount})`,
+      );
+    }
+    console.log(`Init values were set`);
   }, hre);
 };
 
-func.tags = [`${CONTRACT_NAME}:transfer`];
+func.tags = [`${CONTRACT_NAME}:init`];
 
 export default func;

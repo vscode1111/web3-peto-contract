@@ -19,20 +19,20 @@ if (!providerUrl) {
   throw new Error("Please set your PROVIDER_URL in a .env file");
 }
 
-const adminPrivateKey = `0x${process.env.ADMIN_PRIVATE_KEY}`;
-if (adminPrivateKey.length < 20) {
-  throw new Error("Please set your ADMIN_PRIVATE_KEY in a .env file");
+const ownerPrivateKey = `0x${process.env.OWNER_PRIVATE_KEY}`;
+if (ownerPrivateKey.length < 20) {
+  throw new Error("Please set your OWNER_PRIVATE_KEY in a .env file");
 }
 function getChainConfig(): NetworkUserConfig {
   return {
     url: providerUrl,
-    accounts: [adminPrivateKey],
+    accounts: [ownerPrivateKey],
   };
 }
 
 const config: HardhatUserConfig = {
-  // defaultNetwork: "opera",
-  defaultNetwork: "polygon",
+  // defaultNetwork: "polygon",
+  defaultNetwork: "bsc",
   etherscan: {
     apiKey: {
       polygon: process.env.POLYGONSCAN_API_KEY || "",
