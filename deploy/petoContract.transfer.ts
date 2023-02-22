@@ -8,9 +8,6 @@ import { callWithTimer, waitForTx } from "utils/common";
 
 import { deployValue } from "./deployData";
 
-const HOST_URL = "https://carbar.online/nft_json";
-const INIT_COLLECTION = true;
-
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimer(async () => {
     const {
@@ -19,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     } = hre;
     const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks] as string;
 
-    console.log(`${CONTRACT_NAME} ${contractAddress} is initiating...`);
+    console.log(`${CONTRACT_NAME} ${contractAddress} starts transfering...`);
 
     const [admin] = await hre.ethers.getSigners();
 
@@ -29,19 +26,18 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
       await contractFactory.connect(admin).attach(contractAddress)
     );
 
-    console.log(`Setting init values...`);
-    await waitForTx(adminContract.setURI(`${HOST_URL}/${deployValue.nftPostfix}/`), "setURI");
-
-    if (INIT_COLLECTION) {
-      await waitForTx(
-        adminContract.createTokens(deployValue.tokenCount),
-        `createTokens (${deployValue.tokenCount})`,
-      );
-    }
-    console.log(`Init values were set`);
+    await waitForTx(
+      // adminContract.safeTransferFrom(admin.address, deployValue.userAddress, deployValue.tokenId),
+      adminContract["safeTransferFrom(address,address,uint256)"](
+        admin.address,
+        deployValue.userAddress,
+        deployValue.tokenId,
+      ),
+      `safeTransferFrom`,
+    );
   }, hre);
 };
 
-func.tags = [`${CONTRACT_NAME}:init`];
+func.tags = [`${CONTRACT_NAME}:transfer`];
 
 export default func;

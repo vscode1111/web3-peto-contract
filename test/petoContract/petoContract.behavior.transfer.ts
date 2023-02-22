@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { testValue } from "test/testData";
 import { initCollectionsReal } from "test/utils";
 
-export function shouldBehaveCorrectTransferring(): void {
+export function shouldBehaveCorrectTransfer(): void {
   describe("fetching", () => {
     it("should call safeTransferFrom(3 params) correctly", async function () {
       await initCollectionsReal(this.adminPetoContract);

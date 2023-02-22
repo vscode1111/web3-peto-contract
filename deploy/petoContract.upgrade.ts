@@ -1,4 +1,4 @@
-import { CONTRACTS, contractName } from "constants/addresses";
+import { CONTRACTS, CONTRACT_NAME } from "constants/addresses";
 import { upgrades } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -14,14 +14,15 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     } = hre;
     const contractAddress = CONTRACTS.PETO[name as keyof DeployNetworks] as string;
 
-    console.log(`${contractName} ${contractAddress} is upgrading...`);
+    console.log(`${CONTRACT_NAME} ${contractAddress} is upgrading...`);
 
-    const contractFactory = <PetoContract__factory>await ethers.getContractFactory(contractName);
+    const contractFactory = <PetoContract__factory>await ethers.getContractFactory(CONTRACT_NAME);
     await upgrades.upgradeProxy(contractAddress, contractFactory);
     await verifyContract(contractAddress, hre);
+    console.log(`${contractAddress} upgraded and verified to ${contractAddress}`);
   }, hre);
 };
 
-func.tags = [`${contractName}:upgrade`];
+func.tags = [`${CONTRACT_NAME}:upgrade`];
 
 export default func;

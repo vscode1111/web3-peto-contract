@@ -1,5 +1,5 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { BigNumber, BigNumberish, ContractTransaction } from "ethers";
+import { BigNumber, BigNumberish, ContractReceipt, ContractTransaction } from "ethers";
 import { ethers } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { StringNumber } from "types/common";
@@ -46,13 +46,17 @@ export async function callWithTimer(
 ) {
   const startTime = new Date();
   let balance0, balance1, diffBalance: number;
-  let admin: SignerWithAddress | null = null;
+  let owner: SignerWithAddress | null = null;
   let extText = "";
 
   if (hre) {
-    [admin] = await hre.ethers.getSigners();
-    balance0 = toNumber(await admin.getBalance());
-    extText = `, balance: ${balance0.toFixed(FRACTION_DIGITS)}`;
+    const {
+      network: { name },
+    } = hre;
+
+    [owner] = await hre.ethers.getSigners();
+    balance0 = toNumber(await owner.getBalance());
+    extText = `, network: ${name}, balance: ${balance0.toFixed(FRACTION_DIGITS)}`;
   }
 
   const startMessage = `->Function was started at ${startTime.toLocaleTimeString()}${extText}`;
@@ -63,10 +67,10 @@ export async function callWithTimer(
     console.log(e);
   }
   const finishTime = new Date();
-  const diff = ((finishTime.getTime() - startTime.getTime()) / 1000).toFixed();
+  const diff = ((finishTime.getTime() - startTime.getTime()) / 1000).toFixed(1);
 
-  if (hre && admin && balance0) {
-    balance1 = toNumber(await admin.getBalance());
+  if (hre && owner && balance0) {
+    balance1 = toNumber(await owner.getBalance());
     diffBalance = balance0 - balance1;
     extText = `, balance: ${balance1.toFixed(FRACTION_DIGITS)}, cost: ${diffBalance.toFixed(
       FRACTION_DIGITS,
@@ -80,7 +84,6 @@ export async function callWithTimer(
 }
 
 export async function delay(ms: number): Promise<number> {
-  // eslint-disable-next-line no-promise-executor-return
   return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
 
@@ -101,14 +104,14 @@ export async function verifyContract(
       });
       return;
     } catch (error) {
+      console.log(error);
       count += 1;
-
       await delay(5000);
     }
   }
 
   if (count === maxTries) {
-    console.log("Failed to verify contract at path %s at address %s", address);
+    console.log("Failed to verify contract address %s", address);
     throw new Error("Verification failed");
   }
 }
@@ -117,16 +120,24 @@ export async function waitForTx(
   promise: Promise<ContractTransaction>,
   functionName?: string,
   // confirmations = 1
-): Promise<ContractTransaction> {
+): Promise<ContractReceipt> {
   if (functionName) {
     console.log(`TX: calling ${functionName}...`);
   }
-  return promise.then((tx) => {
-    if (functionName) {
-      console.log(`TX: waiting ${functionName}...`);
-    }
-    // tx.wait(confirmations);
-    tx.wait();
-    return tx;
-  });
+  // return promise.then((tx) => {
+  //   if (functionName) {
+  //     console.log(`TX: waiting ${functionName}...`);
+  //   }
+  //   // tx.wait(confirmations);
+  //   tx.wait();
+  //   return tx;
+  // });
+  const tx = await promise;
+
+  if (functionName) {
+    console.log(`TX: waiting ${functionName} hash: ${tx.hash}...`);
+  }
+
+  const receipt = await tx.wait();
+  return receipt;
 }
