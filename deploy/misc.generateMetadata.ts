@@ -1,9 +1,7 @@
 import appRoot from "app-root-path";
+import { callWithTimerHre } from "common";
 import fs from "fs";
 import { DeployFunction } from "hardhat-deploy/types";
-import { callWithTimer } from "utils/common";
-
-import { deployValue } from "./deployData";
 
 interface IMetadata {
   name: string;
@@ -12,7 +10,7 @@ interface IMetadata {
   description: string;
 }
 
-const CONTRACT_NAME = `erc721_test_${deployValue.nftPostfix}`;
+const CONTRACT_NAME = `erc721_test_0`;
 
 const DICTIONARY: Record<string | number, IMetadata> = {
   0: {
@@ -48,8 +46,8 @@ const DICTIONARY: Record<string | number, IMetadata> = {
 };
 
 const func: DeployFunction = async (): Promise<void> => {
-  await callWithTimer(async () => {
-    const dir = `${appRoot.toString()}/nft/${deployValue.nftPostfix}`;
+  await callWithTimerHre(async () => {
+    const dir = `${appRoot.toString()}/nft/}`;
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, {

@@ -7,51 +7,47 @@ import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import "tsconfig-paths/register";
+import { DeployNetworks } from "types";
+
+import { getEnv } from "./common/config";
 
 const dotenvConfigPath: string = process.env.DOTENV_CONFIG_PATH || "./.env";
 dotenvConfig({
   path: resolve(__dirname, dotenvConfigPath),
 });
 
-// Ensure that we have all the environment variables we need.
-const providerUrl: string | undefined = process.env.PROVIDER_URL;
-if (!providerUrl) {
-  throw new Error("Please set your PROVIDER_URL in a .env file");
-}
-
-const ownerPrivateKey = `0x${process.env.OWNER_PRIVATE_KEY}`;
-if (ownerPrivateKey.length < 20) {
-  throw new Error("Please set your OWNER_PRIVATE_KEY in a .env file");
-}
-function getChainConfig(): NetworkUserConfig {
+function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?: string } {
   return {
-    url: providerUrl,
-    accounts: [ownerPrivateKey],
+    url: getEnv(`${chain.toUpperCase()}_PROVIDER_URL`),
+    accounts: [
+      `0x${getEnv("OWNER_PRIVATE_KEY")}`,
+      `0x${getEnv("USER1_PRIVATE_KEY")}`,
+      `0x${getEnv("USER2_PRIVATE_KEY")}`,
+    ],
   };
 }
 
+const defaultNetwork: keyof DeployNetworks = "opera";
+
 const config: HardhatUserConfig = {
-  // defaultNetwork: "polygon",
-  defaultNetwork: "bsc",
+  defaultNetwork,
   etherscan: {
     apiKey: {
-      polygon: process.env.POLYGONSCAN_API_KEY || "",
-      polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
-      opera: process.env.FANTOMSCAN_API_KEY || "",
-      bsc: process.env.BSCSCAN_API_KEY || "",
+      polygon: getEnv("POLYGONSCAN_API_KEY"),
+      opera: getEnv("OPERASCAN_API_KEY"),
+      bsc: getEnv("BSCSCAN_API_KEY"),
     },
   },
   gasReporter: {
     currency: "USD",
-    enabled: process.env.REPORT_GAS ? true : false,
+    enabled: false,
     excludeContracts: [],
     src: "./contracts",
   },
   networks: {
-    polygon: getChainConfig(),
-    mumbai: getChainConfig(),
-    opera: getChainConfig(),
-    bsc: getChainConfig(),
+    polygon: getChainConfig("polygon"),
+    opera: getChainConfig("opera"),
+    bsc: getChainConfig("bsc"),
   },
   paths: {
     artifacts: "./artifacts",
@@ -65,8 +61,6 @@ const config: HardhatUserConfig = {
       metadata: {
         bytecodeHash: "none",
       },
-      // Disable the optimizer when debugging
-      // https://hardhat.org/hardhat-network/#solidity-optimizer-support
       optimizer: {
         enabled: true,
         runs: 800,

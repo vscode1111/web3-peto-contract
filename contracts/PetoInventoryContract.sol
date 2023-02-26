@@ -9,11 +9,16 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "hardhat/console.sol";
 
-// contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
-contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable {
+contract PetoInventoryContract is
+    Initializable,
+    ERC721Upgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using StringsUpgradeable for uint256;
 
@@ -25,7 +30,12 @@ contract PetoContract is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     function initialize(string memory name_, string memory symbol_) public initializer {
         __ERC721_init(name_, symbol_);
         __Ownable_init();
+        __UUPSUpgradeable_init();
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+    //--------------------------------------------------
 
     CountersUpgradeable.Counter private _tokenIdCounter;
 

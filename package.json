@@ -10,12 +10,22 @@
     "coverage": "hardhat coverage --network hardhat --solcoverjs ./.solcover.js --temp artifacts --testfiles \"test/**/*.ts\" && yarn typechain",
     "deploy": "hardhat deploy",
     "deploy:accounts": "hardhat deploy --tags accounts",
-    "deploy:proxy": "hardhat deploy --tags PetoContract:proxy",
-    "deploy:verify": "hardhat deploy --tags PetoContract:verify",
-    "deploy:init": "hardhat deploy --tags PetoContract:init",
-    "deploy:upgrade": "hardhat deploy --tags PetoContract:upgrade",
-    "deploy:transfer": "hardhat deploy --tags PetoContract:transfer",
-    "deploy:fetch": "hardhat deploy --tags PetoContract:fetch",
+    "deploy:bet:proxy": "hardhat deploy --tags PetoBetContract:proxy",
+    "deploy:bet:verify": "hardhat deploy --tags PetoBetContract:verify",
+    "deploy:bet:upgrade": "hardhat deploy --tags PetoBetContract:upgrade",
+    "deploy:bet:fetch": "hardhat deploy --tags PetoBetContract:fetch",
+    "deploy:bet:deposit1": "hardhat deploy --tags PetoBetContract:deposit1",
+    "deploy:bet:deposit2": "hardhat deploy --tags PetoBetContract:deposit2",
+    "deploy:bet:lock-pair": "hardhat deploy --tags PetoBetContract:lock-pair",
+    "deploy:bet:transfer": "hardhat deploy --tags PetoBetContract:transfer",
+    "deploy:bet:withdraw1": "hardhat deploy --tags PetoBetContract:withdraw1",
+    "deploy:bet:withdraw-all": "hardhat deploy --tags PetoBetContract:withdraw-all",
+    "deploy:inv:proxy": "hardhat deploy --tags PetoInventoryContract:proxy",
+    "deploy:inv:verify": "hardhat deploy --tags PetoInventoryContract:verify",
+    "deploy:inv:init": "hardhat deploy --tags PetoInventoryContract:init",
+    "deploy:inv:upgrade": "hardhat deploy --tags PetoInventoryContract:upgrade",
+    "deploy:inv:transfer": "hardhat deploy --tags PetoInventoryContract:transfer",
+    "deploy:inv:fetch": "hardhat deploy --tags PetoInventoryContract:fetch",
     "deploy:generate-metadata": "hardhat deploy --tags misc:generate-metadata",
     "lint": "yarn lint:sol && yarn lint:ts && yarn prettier:check",
     "lint:sol": "solhint --config ./.solhint.json --max-warnings 0 \"contracts/**/*.sol\"",
@@ -101,5 +111,8 @@
   "packageManager": "yarn@3.2.1",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.191"
   }
 }

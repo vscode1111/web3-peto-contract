@@ -1,8 +1,20 @@
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+
 export interface DeployNetworks {
-  mumbai: string;
   polygon: string;
   opera: string;
   bsc: string;
+}
+
+export interface Addresses {
+  petoBetAddress: string;
+  petoInventoryAddress: string;
+}
+
+export interface Users {
+  owner: SignerWithAddress;
+  user1: SignerWithAddress;
+  user2: SignerWithAddress;
 }
 
 export type StringNumber = string | number;
