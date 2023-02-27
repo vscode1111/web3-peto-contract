@@ -27,7 +27,7 @@ function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?
   };
 }
 
-const defaultNetwork: keyof DeployNetworks = "opera";
+const defaultNetwork: keyof DeployNetworks = "polygon";
 
 const config: HardhatUserConfig = {
   defaultNetwork,

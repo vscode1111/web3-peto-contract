@@ -12,7 +12,7 @@ export const CONTRACTS: Record<CONTRACT_LIST, DeployNetworks> = {
   PETO_BET: {
     opera: "0xd4971E5a6F0f7c3120136E2fD2f4bc251BfC83A6",
     bsc: "",
-    polygon: "0x6E81c2A045EC1791d0D6c23906E56e77073460F2", //test
+    polygon: "0x7988361Fa39b49C619716C96F93665DC326f24CD", //test
   },
   PETO_INVENTORY: {
     opera: "0x8e933cd23c6cB61Bd37033555223De1Aeec54bC2",

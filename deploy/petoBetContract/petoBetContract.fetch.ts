@@ -1,8 +1,10 @@
-import { callWithTimerHre, printBigNumber } from "common";
+import { callWithTimerHre } from "common";
 import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { getAddressesFromHre, getPetoBetContext, getUsers } from "utils";
+
+import { printFeeBalance, printUserBalance } from "./utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
@@ -14,19 +16,11 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const { ownerPetoBetContract } = await getPetoBetContext(users, petoBetAddress);
 
     const user1Balance = await ownerPetoBetContract.balanceOf(user1.address);
-    console.log(
-      `user1 free:${printBigNumber(user1Balance.free)}, locked:${printBigNumber(
-        user1Balance.locked,
-      )}`,
-    );
+    printUserBalance(user1Balance);
     const user2Balance = await ownerPetoBetContract.balanceOf(user2.address);
-    console.log(
-      `user1 free:${printBigNumber(user2Balance.free)}, locked:${printBigNumber(
-        user2Balance.locked,
-      )}`,
-    );
+    printUserBalance(user2Balance);
     const feeBalance = await ownerPetoBetContract.getFeeBalance();
-    console.log(`fee balance:${printBigNumber(feeBalance)}`);
+    printFeeBalance(feeBalance);
   }, hre);
 };
 

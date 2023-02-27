@@ -144,9 +144,25 @@ export function shouldBehaveCorrectFunding(): void {
             );
           });
 
-          it("check event when call lockPair", async function () {
+          it("check event when call lock", async function () {
             const receipt = await waitForTx(
-              this.ownerPetoBetContract.lockPair(
+              this.ownerPetoBetContract.lock(this.user1.address, seedData.lock),
+            );
+
+            const tokenSoldEvent = receipt.events?.find(
+              (item) => item.event === "Lock",
+            ) as LockEvent;
+
+            expect(tokenSoldEvent).not.undefined;
+            const { account, amount, timestamp } = tokenSoldEvent.args;
+            expect(account).equal(this.user1.address);
+            expect(amount).equal(seedData.lock);
+            expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+          });
+
+          it("check event when call pairLock", async function () {
+            const receipt = await waitForTx(
+              this.ownerPetoBetContract.pairLock(
                 this.user1.address,
                 this.user2.address,
                 seedData.lock,
@@ -160,23 +176,27 @@ export function shouldBehaveCorrectFunding(): void {
             expect(tokenSoldEvents.length).equal(2);
 
             let tokenSoldEvent = tokenSoldEvents[0];
-            expect(tokenSoldEvent).not.undefined;
             const { args: args1 } = tokenSoldEvent;
             expect(args1?.account).equal(this.user1.address);
             expect(args1?.amount).equal(seedData.lock);
             expect(args1?.timestamp).closeTo(getNow(), seedData.timeDelta);
 
             tokenSoldEvent = tokenSoldEvents[1];
-            expect(tokenSoldEvent).not.undefined;
             const { args: args2 } = tokenSoldEvent;
             expect(args2?.account).equal(this.user2.address);
             expect(args2?.amount).equal(seedData.lock);
             expect(args2?.timestamp).closeTo(getNow(), seedData.timeDelta);
           });
 
-          it("should throw error when user1 tries to call lockPair without permission", async function () {
+          it("should throw error when user1 tries to call lock insufficent funds", async function () {
             await expect(
-              this.user1PetoBetContract.lockPair(
+              this.user1PetoBetContract.lock(this.user1.address, seedData.deposit12),
+            ).rejectedWith(vmEsceptionText(errorMessage.insufficentFunds));
+          });
+
+          it("should throw error when user1 tries to call pairLock without permission", async function () {
+            await expect(
+              this.user1PetoBetContract.pairLock(
                 this.user1.address,
                 this.user2.address,
                 seedData.lock,
@@ -186,11 +206,15 @@ export function shouldBehaveCorrectFunding(): void {
 
           describe("owner locked funds of user1 and user2", () => {
             beforeEach(async function () {
-              await this.ownerPetoBetContract.lockPair(
-                this.user1.address,
-                this.user2.address,
-                seedData.lock,
-              );
+              // Alternative way
+              // await this.ownerPetoBetContract.pairLock(
+              //   this.user1.address,
+              //   this.user2.address,
+              //   seedData.lock,
+              // );
+
+              await this.user1PetoBetContract.lock(this.user1.address, seedData.lock);
+              await this.user2PetoBetContract.lock(this.user2.address, seedData.lock);
             });
 
             it(INITIAL_POSITIVE_CHECK_TEST_TITLE, async function () {

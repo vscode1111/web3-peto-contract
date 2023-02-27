@@ -95,14 +95,14 @@ contract PetoBetContract is
         return _balances[account];
     }
 
-    function lock(address account, uint256 amount) private onlySufficentFunds(account, amount) {
+    function lock(address account, uint256 amount) public onlySufficentFunds(account, amount) {
         FundItem storage fund = _balances[account];
         fund.free -= amount;
         fund.locked += amount;
         emit Lock(account, amount, uint32(block.timestamp));
     }
 
-    function lockPair(address account1, address account2, uint256 amount) external onlyOwner {
+    function pairLock(address account1, address account2, uint256 amount) external onlyOwner {
         lock(account1, amount);
         lock(account2, amount);
     }

@@ -8,19 +8,16 @@ import { getAddressesFromHre, getPetoBetContext, getUsers } from "utils";
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
     const { petoBetAddress } = await getAddressesFromHre(hre);
-    console.log(`${PETO_BET_CONTRACT_NAME} ${petoBetAddress} starts depositing by user1...`);
+    console.log(`${PETO_BET_CONTRACT_NAME} ${petoBetAddress} starts locking by user1...`);
 
-    const { user1PetoBetContract } = await getPetoBetContext(await getUsers(), petoBetAddress);
+    const users = await getUsers();
+    const { user1 } = users;
+    const { user1PetoBetContract } = await getPetoBetContext(users, petoBetAddress);
 
-    await waitForTx(
-      user1PetoBetContract.deposit({
-        value: seedData.deposit1,
-      }),
-      `deposit1`,
-    );
+    await waitForTx(user1PetoBetContract.lock(user1.address, seedData.lock), `lock`);
   }, hre);
 };
 
-func.tags = [`${PETO_BET_CONTRACT_NAME}:deposit1`];
+func.tags = [`${PETO_BET_CONTRACT_NAME}:lock1`];
 
 export default func;

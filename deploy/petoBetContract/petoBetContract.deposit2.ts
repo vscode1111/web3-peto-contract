@@ -8,7 +8,7 @@ import { getAddressesFromHre, getPetoBetContext, getUsers } from "utils";
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
     const { petoBetAddress } = await getAddressesFromHre(hre);
-    console.log(`${PETO_BET_CONTRACT_NAME} ${petoBetAddress} starts depositing...`);
+    console.log(`${PETO_BET_CONTRACT_NAME} ${petoBetAddress} starts depositing by user2...`);
 
     const { user2PetoBetContract } = await getPetoBetContext(await getUsers(), petoBetAddress);
 
