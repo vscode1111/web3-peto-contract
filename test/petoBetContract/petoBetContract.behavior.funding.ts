@@ -4,7 +4,7 @@ import {
   commonErrorMessage,
   getNow,
   vmEsceptionText,
-  waitForTx,
+  waitTx,
 } from "common";
 import { seedData } from "seeds";
 import {
@@ -16,13 +16,13 @@ import {
 } from "typechain-types/contracts/PetoBetContract";
 
 import { errorMessage } from "./testData";
-import { checkTotalBalance } from "./utils";
+import { checkTotalBalance, checkTransfer } from "./utils";
 
 export function shouldBehaveCorrectFunding(): void {
   describe("funding", () => {
     describe("first check", () => {
       it(INITIAL_POSITIVE_CHECK_TEST_TITLE, async function () {
-        const receipt = await waitForTx(
+        const receipt = await waitTx(
           this.user1PetoBetContract.deposit({ value: seedData.deposit1 }),
         );
 
@@ -65,7 +65,7 @@ export function shouldBehaveCorrectFunding(): void {
         });
 
         it("user1 is allowed to withdraw", async function () {
-          const receipt = await waitForTx(this.user1PetoBetContract.withdraw(seedData.deposit1));
+          const receipt = await waitTx(this.user1PetoBetContract.withdraw(seedData.deposit1));
 
           const tokenSoldEvent = receipt.events?.find(
             (item) => item.event === "Withdraw",
@@ -145,7 +145,7 @@ export function shouldBehaveCorrectFunding(): void {
           });
 
           it("check event when call lock", async function () {
-            const receipt = await waitForTx(
+            const receipt = await waitTx(
               this.ownerPetoBetContract.lock(this.user1.address, seedData.lock),
             );
 
@@ -161,7 +161,7 @@ export function shouldBehaveCorrectFunding(): void {
           });
 
           it("check event when call pairLock", async function () {
-            const receipt = await waitForTx(
+            const receipt = await waitTx(
               this.ownerPetoBetContract.pairLock(
                 this.user1.address,
                 this.user2.address,
@@ -280,8 +280,78 @@ export function shouldBehaveCorrectFunding(): void {
               );
             });
 
+            it("check call transfer with 0 fee", async function () {
+              const receipt = await waitTx(
+                this.ownerPetoBetContract.transfer(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.lock,
+                  seedData.zero,
+                ),
+              );
+
+              const tokenSoldEvent = receipt.events?.find(
+                (item) => item.event === "Transfer",
+              ) as TransferEvent;
+
+              expect(tokenSoldEvent).not.undefined;
+
+              const { from, to, amount, feeRate, timestamp } = tokenSoldEvent?.args;
+
+              expect(from).equal(this.user1.address);
+              expect(to).equal(this.user2.address);
+              expect(amount).equal(seedData.lock);
+              expect(feeRate).equal(seedData.zero);
+              expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+
+              const user1Balance = await this.ownerPetoBetContract.balanceOf(this.user1.address);
+              expect(user1Balance.free).equal(seedData.remains1);
+              expect(user1Balance.locked).equal(seedData.zero);
+
+              const user2Balance = await this.ownerPetoBetContract.balanceOf(this.user2.address);
+              expect(user2Balance.free).equal(seedData.deposit2.add(seedData.lock));
+              expect(user2Balance.locked).equal(seedData.zero);
+
+              expect(await this.ownerPetoBetContract.getFeeBalance()).equal(seedData.zero);
+              expect(await this.ownerPetoBetContract.getBalance()).equal(seedData.deposit12);
+              await checkTotalBalance(this);
+            });
+
+            it.skip("check call transfer in series", async function () {
+              const miniLock = seedData.lock.div(2);
+
+              await this.ownerPetoBetContract.transfer(
+                this.user1.address,
+                this.user2.address,
+                miniLock,
+                seedData.zero,
+              );
+
+              await this.ownerPetoBetContract.transfer(
+                this.user1.address,
+                this.user2.address,
+                miniLock,
+                seedData.zero,
+              );
+
+              const user1Balance = await this.ownerPetoBetContract.balanceOf(this.user1.address);
+              expect(user1Balance.free).equal(seedData.remains1);
+              expect(user1Balance.locked).equal(seedData.zero);
+
+              const user2Balance = await this.ownerPetoBetContract.balanceOf(this.user2.address);
+              expect(user2Balance.free).equal(seedData.deposit2.add(seedData.lock));
+              expect(user2Balance.locked).equal(seedData.zero);
+
+              expect(await this.ownerPetoBetContract.getFeeBalance()).equal(seedData.zero);
+              expect(await this.ownerPetoBetContract.getBalance()).equal(seedData.deposit12);
+              await checkTotalBalance(this);
+
+              await this.user1PetoBetContract.withdraw(seedData.remains1);
+              await this.user2PetoBetContract.withdraw(seedData.remains1);
+            });
+
             it("check lock event when call transfer", async function () {
-              const receipt = await waitForTx(
+              const receipt = await waitTx(
                 this.ownerPetoBetContract.transfer(
                   this.user1.address,
                   this.user2.address,
@@ -423,7 +493,7 @@ export function shouldBehaveCorrectFunding(): void {
               });
 
               it("check event when call withdrawFee", async function () {
-                const receipt = await waitForTx(
+                const receipt = await waitTx(
                   this.ownerPetoBetContract.withdrawFee(this.owner.address, seedData.feeBalance),
                 );
 
@@ -435,6 +505,12 @@ export function shouldBehaveCorrectFunding(): void {
                 expect(account).equal(this.owner.address);
                 expect(amount).equal(seedData.feeBalance);
                 expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+              });
+
+              it("check transfer sequentially", async function () {
+                await checkTransfer(this, 2);
+                await checkTransfer(this, 3);
+                await checkTransfer(this, 4);
               });
 
               describe("owner, user1 and user2 withdrawed their funds", () => {

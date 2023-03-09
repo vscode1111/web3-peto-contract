@@ -13,6 +13,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const { petoBetFactory } = await getPetoBetContext(await getUsers(), petoBetAddress);
 
     await upgrades.upgradeProxy(petoBetAddress, petoBetFactory);
+    console.log(`${PETO_BET_CONTRACT_NAME} ${petoBetAddress} was upgraded`);
     await verifyContract(petoBetAddress, hre);
     console.log(`${petoBetAddress} upgraded and verified to ${petoBetAddress}`);
   }, hre);

@@ -33,9 +33,9 @@ const config: HardhatUserConfig = {
   defaultNetwork,
   etherscan: {
     apiKey: {
-      polygon: getEnv("POLYGONSCAN_API_KEY"),
-      opera: getEnv("OPERASCAN_API_KEY"),
-      bsc: getEnv("BSCSCAN_API_KEY"),
+      polygon: getEnv("POLYGON_SCAN_API_KEY"),
+      opera: getEnv("OPERA_SCAN_API_KEY"),
+      bsc: getEnv("BSC_SCAN_API_KEY"),
     },
   },
   gasReporter: {

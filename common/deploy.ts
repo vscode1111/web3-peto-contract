@@ -5,7 +5,7 @@ import _ from "lodash";
 import { DeployNetworks } from "types";
 
 import { DiffArray } from "./DiffArray";
-import { toNumber } from "./misc";
+import { toNumber } from "./converts";
 
 export const DECIMAL_FACTOR = 1e18;
 const FRACTION_DIGITS = 3;
@@ -70,6 +70,13 @@ export async function callWithTimerHre(
   console.log(finishMessage);
 }
 
+// https://github.com/astra-net/astra-scan.backend/blob/8f9618d8d4df0976b5544b75ed5636b2ef949acd/src/indexer/rpc/transport/ws/WebSocketRPC.ts
+export function timeoutPromise(callTimeout: number) {
+  return new Promise((_, reject) =>
+    setTimeout(() => reject(new Error(`Timeout error in ${callTimeout}ms`)), callTimeout),
+  );
+}
+
 export async function delay(ms: number): Promise<number> {
   return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
@@ -127,7 +134,7 @@ export async function attempt(fn: () => Promise<any>, attempts = 3, delayMs = 10
   }
 }
 
-export async function waitForTx(
+export async function waitTx(
   promise: Promise<ContractTransaction>,
   functionName?: string,
   attempts = 3,

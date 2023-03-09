@@ -19,3 +19,28 @@ export async function checkTotalBalance(that: PetoBetContextBase) {
     await getTotalBalance([that.user1, that.user2, that.owner, that.ownerPetoBetContract]),
   ).closeTo(seedData.totalAccountBalance, seedData.error);
 }
+
+export async function checkTransfer(that: PetoBetContextBase, iterationNumber: number) {
+  await that.user1PetoBetContract.lock(that.user1.address, seedData.lock);
+  await that.user2PetoBetContract.lock(that.user2.address, seedData.lock);
+
+  await that.ownerPetoBetContract.transfer(
+    that.user1.address,
+    that.user2.address,
+    seedData.lock,
+    seedData.feeRate,
+  );
+
+  expect(await that.user1.getBalance()).closeTo(
+    seedData.accountInitBalance.sub(seedData.deposit1),
+    seedData.error,
+  );
+  expect(await that.user2.getBalance()).closeTo(
+    seedData.accountInitBalance.sub(seedData.deposit2),
+    seedData.error,
+  );
+  expect(await that.ownerPetoBetContract.getFeeBalance()).equal(
+    seedData.feeBalance.mul(iterationNumber),
+  );
+  expect(await that.ownerPetoBetContract.getBalance()).equal(seedData.deposit12);
+}

@@ -16,5 +16,3 @@ export interface Users {
   user1: SignerWithAddress;
   user2: SignerWithAddress;
 }
-
-export type StringNumber = string | number;

@@ -1,4 +1,4 @@
-import { callWithTimerHre, waitForTx } from "common";
+import { callWithTimerHre, waitTx } from "common";
 import { PETO_INVENTORY_CONTRACT_NAME } from "constants/addresses";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -18,7 +18,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
       petoInventoryAddress,
     );
 
-    await waitForTx(
+    await waitTx(
       ownerPetoInventoryContract["safeTransferFrom(address,address,uint256)"](
         owner.address,
         deployData.userAddress,

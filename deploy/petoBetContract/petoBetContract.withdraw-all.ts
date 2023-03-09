@@ -1,4 +1,4 @@
-import { callWithTimerHre, waitForTx } from "common";
+import { callWithTimerHre, waitTx } from "common";
 import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -19,19 +19,19 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const user1Balance = await ownerPetoBetContract.balanceOf(user1.address);
     printUserBalance(user1Balance);
     if (user1Balance.free.gt(0)) {
-      await waitForTx(user1PetoBetContract.withdraw(user1Balance.free), `withdraw`);
+      await waitTx(user1PetoBetContract.withdraw(user1Balance.free), `withdraw`);
     }
 
     const user2Balance = await ownerPetoBetContract.balanceOf(user2.address);
     printUserBalance(user2Balance);
     if (user2Balance.free.gt(0)) {
-      await waitForTx(user2PetoBetContract.withdraw(user2Balance.free), `withdraw`);
+      await waitTx(user2PetoBetContract.withdraw(user2Balance.free), `withdraw`);
     }
 
     const feeBalance = await ownerPetoBetContract.getFeeBalance();
     printFeeBalance(feeBalance);
     if (feeBalance.gt(0)) {
-      await waitForTx(ownerPetoBetContract.withdrawFee(owner.address, feeBalance), `withdrawFee`);
+      await waitTx(ownerPetoBetContract.withdrawFee(owner.address, feeBalance), `withdrawFee`);
     }
   }, hre);
 };

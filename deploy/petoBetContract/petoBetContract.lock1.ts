@@ -1,4 +1,4 @@
-import { callWithTimerHre, waitForTx } from "common";
+import { callWithTimerHre, waitTx } from "common";
 import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const { user1 } = users;
     const { user1PetoBetContract } = await getPetoBetContext(users, petoBetAddress);
 
-    await waitForTx(user1PetoBetContract.lock(user1.address, seedData.lock), `lock`);
+    await waitTx(user1PetoBetContract.lock(user1.address, seedData.lock), `lock`);
   }, hre);
 };
 

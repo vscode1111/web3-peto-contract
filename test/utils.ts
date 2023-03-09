@@ -1,5 +1,5 @@
+import { StringNumber } from "common";
 import { PetoInventoryContract } from "typechain-types/contracts/PetoInventoryContract";
-import { StringNumber } from "types";
 
 import { testData } from "./petoInventoryContract/testData";
 

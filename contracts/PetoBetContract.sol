@@ -128,8 +128,9 @@ contract PetoBetContract is
         );
 
         fromFund.locked -= amount;
-        feeBalance = (amount * feeRate) / DECIMAL_FACTOR / 100;
-        uint256 win = amount - feeBalance;
+        uint256 fee = (amount * feeRate) / DECIMAL_FACTOR / 100;
+        uint256 win = amount - fee;
+        feeBalance += fee;
 
         toFund.locked -= amount;
         toFund.free += amount + win;
