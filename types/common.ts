@@ -15,4 +15,5 @@ export interface Users {
   owner: SignerWithAddress;
   user1: SignerWithAddress;
   user2: SignerWithAddress;
+  user3: SignerWithAddress;
 }

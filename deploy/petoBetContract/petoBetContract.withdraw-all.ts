@@ -17,13 +17,13 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
       await getPetoBetContext(users, petoBetAddress);
 
     const user1Balance = await ownerPetoBetContract.balanceOf(user1.address);
-    printUserBalance(user1Balance);
+    printUserBalance(user1Balance, "user1");
     if (user1Balance.free.gt(0)) {
       await waitTx(user1PetoBetContract.withdraw(user1Balance.free), `withdraw`);
     }
 
     const user2Balance = await ownerPetoBetContract.balanceOf(user2.address);
-    printUserBalance(user2Balance);
+    printUserBalance(user2Balance, "user2");
     if (user2Balance.free.gt(0)) {
       await waitTx(user2PetoBetContract.withdraw(user2Balance.free), `withdraw`);
     }

@@ -23,6 +23,7 @@ function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?
       `0x${getEnv("OWNER_PRIVATE_KEY")}`,
       `0x${getEnv("USER1_PRIVATE_KEY")}`,
       `0x${getEnv("USER2_PRIVATE_KEY")}`,
+      `0x${getEnv("USER3_PRIVATE_KEY")}`,
     ],
   };
 }
@@ -39,8 +40,8 @@ const config: HardhatUserConfig = {
     },
   },
   gasReporter: {
-    currency: "USD",
     enabled: false,
+    currency: "USD",
     excludeContracts: [],
     src: "./contracts",
   },

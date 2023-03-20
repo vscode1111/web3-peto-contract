@@ -13,9 +13,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const users = await getUsers();
     const { user1, user2 } = users;
     const { ownerPetoBetContract } = await getPetoBetContext(users, petoBetAddress);
+    console.log(`gameId: ${seedData.gameId0}`);
 
     await waitTx(
-      ownerPetoBetContract.pairLock(user1.address, user2.address, seedData.lock),
+      ownerPetoBetContract.pairLock(user1.address, user2.address, seedData.gameId0, seedData.lock),
       `pairLock`,
     );
   }, hre);

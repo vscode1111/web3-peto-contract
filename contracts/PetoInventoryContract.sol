@@ -50,12 +50,12 @@ contract PetoInventoryContract is
 
     function safeMint(address to) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
-        CreateItem(uint32(tokenId), to);
+        createItem(uint32(tokenId), to);
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
     }
 
-    function CreateItem(uint32 tokenId, address owner_) private onlyOwner {
+    function createItem(uint32 tokenId, address owner_) private onlyOwner {
         _tokenItems[tokenId] = TokenItem(tokenId, owner_);
     }
 

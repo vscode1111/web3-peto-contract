@@ -9,13 +9,15 @@ import {
 import { seedData } from "seeds";
 import {
   DepositEvent,
-  LockEvent,
+  PairLockEvent,
   TransferEvent,
   WithdrawEvent,
   WithdrawFeeEvent,
 } from "typechain-types/contracts/PetoBetContract";
+import { signMessageForTransferEx } from "utils";
 
 import { errorMessage } from "./testData";
+import { EvenName } from "./types";
 import { checkTotalBalance, checkTransfer } from "./utils";
 
 export function shouldBehaveCorrectFunding(): void {
@@ -26,11 +28,11 @@ export function shouldBehaveCorrectFunding(): void {
           this.user1PetoBetContract.deposit({ value: seedData.deposit1 }),
         );
 
-        const tokenSoldEvent = receipt.events?.find(
-          (item) => item.event === "Deposit",
+        const event = receipt.events?.find(
+          (item) => item.event === EvenName.Deposit,
         ) as DepositEvent;
-        expect(tokenSoldEvent).not.undefined;
-        const { account, amount, timestamp } = tokenSoldEvent?.args;
+        expect(event).not.undefined;
+        const { account, amount, timestamp } = event?.args;
         expect(account).equal(this.user1.address);
         expect(amount).equal(seedData.deposit1);
         expect(timestamp).closeTo(getNow(), seedData.timeDelta);
@@ -67,11 +69,11 @@ export function shouldBehaveCorrectFunding(): void {
         it("user1 is allowed to withdraw", async function () {
           const receipt = await waitTx(this.user1PetoBetContract.withdraw(seedData.deposit1));
 
-          const tokenSoldEvent = receipt.events?.find(
-            (item) => item.event === "Withdraw",
+          const event = receipt.events?.find(
+            (item) => item.event === EvenName.Withdraw,
           ) as WithdrawEvent;
-          expect(tokenSoldEvent).not.undefined;
-          const { account, amount, timestamp } = tokenSoldEvent?.args;
+          expect(event).not.undefined;
+          const { account, amount, timestamp } = event?.args;
           expect(account).equal(this.user1.address);
           expect(amount).equal(seedData.deposit1);
           expect(timestamp).closeTo(getNow(), seedData.timeDelta);
@@ -144,54 +146,44 @@ export function shouldBehaveCorrectFunding(): void {
             );
           });
 
-          it("check event when call lock", async function () {
-            const receipt = await waitTx(
-              this.ownerPetoBetContract.lock(this.user1.address, seedData.lock),
-            );
-
-            const tokenSoldEvent = receipt.events?.find(
-              (item) => item.event === "Lock",
-            ) as LockEvent;
-
-            expect(tokenSoldEvent).not.undefined;
-            const { account, amount, timestamp } = tokenSoldEvent.args;
-            expect(account).equal(this.user1.address);
-            expect(amount).equal(seedData.lock);
-            expect(timestamp).closeTo(getNow(), seedData.timeDelta);
-          });
-
           it("check event when call pairLock", async function () {
             const receipt = await waitTx(
               this.ownerPetoBetContract.pairLock(
                 this.user1.address,
                 this.user2.address,
+                seedData.gameId0,
                 seedData.lock,
               ),
             );
 
-            const tokenSoldEvents = receipt.events?.filter(
-              (item) => item.event === "Lock",
-            ) as LockEvent[];
-
-            expect(tokenSoldEvents.length).equal(2);
-
-            let tokenSoldEvent = tokenSoldEvents[0];
-            const { args: args1 } = tokenSoldEvent;
-            expect(args1?.account).equal(this.user1.address);
-            expect(args1?.amount).equal(seedData.lock);
-            expect(args1?.timestamp).closeTo(getNow(), seedData.timeDelta);
-
-            tokenSoldEvent = tokenSoldEvents[1];
-            const { args: args2 } = tokenSoldEvent;
-            expect(args2?.account).equal(this.user2.address);
-            expect(args2?.amount).equal(seedData.lock);
-            expect(args2?.timestamp).closeTo(getNow(), seedData.timeDelta);
+            const event = receipt.events?.find(
+              (item) => item.event === EvenName.PairLock,
+            ) as PairLockEvent;
+            expect(event).not.undefined;
+            const { account1, account2, gameIdHash, amount, timestamp } = event?.args;
+            expect(account1).equal(this.user1.address);
+            expect(account2).equal(this.user2.address);
+            expect(gameIdHash).equal(seedData.gameIdHash0);
+            expect(amount).equal(seedData.lock);
+            expect(timestamp).closeTo(getNow(), seedData.timeDelta);
           });
 
-          it("should throw error when user1 tries to call lock insufficent funds", async function () {
+          it("should throw error when owner  tries to call pairLock twice", async function () {
+            await this.ownerPetoBetContract.pairLock(
+              this.user1.address,
+              this.user2.address,
+              seedData.gameId0,
+              seedData.lock,
+            );
+
             await expect(
-              this.user1PetoBetContract.lock(this.user1.address, seedData.deposit12),
-            ).rejectedWith(vmEsceptionText(errorMessage.insufficentFunds));
+              this.ownerPetoBetContract.pairLock(
+                this.user1.address,
+                this.user2.address,
+                seedData.gameId0,
+                seedData.lock,
+              ),
+            ).rejectedWith(vmEsceptionText(errorMessage.thisGameIdWasUsedBefore));
           });
 
           it("should throw error when user1 tries to call pairLock without permission", async function () {
@@ -199,6 +191,7 @@ export function shouldBehaveCorrectFunding(): void {
               this.user1PetoBetContract.pairLock(
                 this.user1.address,
                 this.user2.address,
+                seedData.gameId0,
                 seedData.lock,
               ),
             ).rejectedWith(vmEsceptionText(commonErrorMessage.onlyOwner));
@@ -206,15 +199,12 @@ export function shouldBehaveCorrectFunding(): void {
 
           describe("owner locked funds of user1 and user2", () => {
             beforeEach(async function () {
-              // Alternative way
-              // await this.ownerPetoBetContract.pairLock(
-              //   this.user1.address,
-              //   this.user2.address,
-              //   seedData.lock,
-              // );
-
-              await this.user1PetoBetContract.lock(this.user1.address, seedData.lock);
-              await this.user2PetoBetContract.lock(this.user2.address, seedData.lock);
+              await this.ownerPetoBetContract.pairLock(
+                this.user1.address,
+                this.user2.address,
+                seedData.gameId0,
+                seedData.lock,
+              );
             });
 
             it(INITIAL_POSITIVE_CHECK_TEST_TITLE, async function () {
@@ -274,6 +264,172 @@ export function shouldBehaveCorrectFunding(): void {
               );
             });
 
+            it("should throw error when owner tries to transfer funds which were tranfered before", async function () {
+              await this.ownerPetoBetContract.transfer(
+                this.user1.address,
+                this.user2.address,
+                seedData.gameId0,
+                seedData.feeRate,
+              );
+
+              await expect(
+                this.ownerPetoBetContract.transfer(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.thisGameIdWasTranferedBefore));
+            });
+
+            it("should throw error when owner tries to transfer using incorrect FROM account", async function () {
+              await expect(
+                this.ownerPetoBetContract.transfer(
+                  this.user3.address,
+                  this.user2.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.fromAccountWasntVerified));
+            });
+
+            it("should throw error when owner tries to transfer using incorrect TO account", async function () {
+              await expect(
+                this.ownerPetoBetContract.transfer(
+                  this.user1.address,
+                  this.user3.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.toAccountWasntVerified));
+            });
+
+            it("user1 is allowed to call transferSig using singnature", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              this.user1PetoBetContract.transferSig(
+                this.user1.address,
+                this.user2.address,
+                seedData.gameId0,
+                seedData.feeRate,
+                signature,
+              );
+            });
+
+            it("user2 is allowed to call transferSig using singnature", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              this.user2PetoBetContract.transferSig(
+                this.user1.address,
+                this.user2.address,
+                seedData.gameId0,
+                seedData.feeRate,
+                signature,
+              );
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect FROM account", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user3.address,
+                  this.user2.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.invalidSignature));
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect TO account", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user1.address,
+                  this.user3.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.invalidSignature));
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect gameId", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId1,
+                  seedData.feeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.invalidSignature));
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect gameId", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId1,
+                  seedData.feeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.invalidSignature));
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect feeRate", async function () {
+              const signature = await signMessageForTransferEx(this);
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId0,
+                  seedData.incorrectFeeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.invalidSignature));
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect signature", async function () {
+              let signature = await signMessageForTransferEx(this);
+
+              signature = signature.slice(0, -1) + "f";
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.invalidSignature));
+            });
+
+            it("should throw error when owner tries to transferSig using incorrect length of signature", async function () {
+              let signature = await signMessageForTransferEx(this);
+
+              signature = signature.slice(0, -2);
+
+              await expect(
+                this.user2PetoBetContract.transferSig(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId0,
+                  seedData.feeRate,
+                  signature,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.singnatureLengthShouldBe65));
+            });
+
             it("should throw error when user2 tries to withdraw insufficent funds", async function () {
               await expect(this.user2PetoBetContract.withdraw(seedData.deposit2)).rejectedWith(
                 vmEsceptionText(errorMessage.insufficentFunds),
@@ -285,21 +441,20 @@ export function shouldBehaveCorrectFunding(): void {
                 this.ownerPetoBetContract.transfer(
                   this.user1.address,
                   this.user2.address,
-                  seedData.lock,
+                  seedData.gameId0,
                   seedData.zero,
                 ),
               );
 
-              const tokenSoldEvent = receipt.events?.find(
-                (item) => item.event === "Transfer",
+              const event = receipt.events?.find(
+                (item) => item.event === EvenName.Transfer,
               ) as TransferEvent;
 
-              expect(tokenSoldEvent).not.undefined;
-
-              const { from, to, amount, feeRate, timestamp } = tokenSoldEvent?.args;
-
+              expect(event).not.undefined;
+              const { from, to, gameIdHash, amount, feeRate, timestamp } = event?.args;
               expect(from).equal(this.user1.address);
               expect(to).equal(this.user2.address);
+              expect(gameIdHash).equal(seedData.gameIdHash0);
               expect(amount).equal(seedData.lock);
               expect(feeRate).equal(seedData.zero);
               expect(timestamp).closeTo(getNow(), seedData.timeDelta);
@@ -317,37 +472,15 @@ export function shouldBehaveCorrectFunding(): void {
               await checkTotalBalance(this);
             });
 
-            it.skip("check call transfer in series", async function () {
-              const miniLock = seedData.lock.div(2);
-
-              await this.ownerPetoBetContract.transfer(
-                this.user1.address,
-                this.user2.address,
-                miniLock,
-                seedData.zero,
-              );
-
-              await this.ownerPetoBetContract.transfer(
-                this.user1.address,
-                this.user2.address,
-                miniLock,
-                seedData.zero,
-              );
-
-              const user1Balance = await this.ownerPetoBetContract.balanceOf(this.user1.address);
-              expect(user1Balance.free).equal(seedData.remains1);
-              expect(user1Balance.locked).equal(seedData.zero);
-
-              const user2Balance = await this.ownerPetoBetContract.balanceOf(this.user2.address);
-              expect(user2Balance.free).equal(seedData.deposit2.add(seedData.lock));
-              expect(user2Balance.locked).equal(seedData.zero);
-
-              expect(await this.ownerPetoBetContract.getFeeBalance()).equal(seedData.zero);
-              expect(await this.ownerPetoBetContract.getBalance()).equal(seedData.deposit12);
-              await checkTotalBalance(this);
-
-              await this.user1PetoBetContract.withdraw(seedData.remains1);
-              await this.user2PetoBetContract.withdraw(seedData.remains1);
+            it("should throw error when owner tries to transfer using gameId which does not exist", async function () {
+              await expect(
+                this.ownerPetoBetContract.transfer(
+                  this.user1.address,
+                  this.user2.address,
+                  seedData.gameId1,
+                  seedData.zero,
+                ),
+              ).rejectedWith(vmEsceptionText(errorMessage.thisGameDoesNotExist));
             });
 
             it("check lock event when call transfer", async function () {
@@ -355,55 +488,52 @@ export function shouldBehaveCorrectFunding(): void {
                 this.ownerPetoBetContract.transfer(
                   this.user1.address,
                   this.user2.address,
-                  seedData.lock,
+                  seedData.gameId0,
                   seedData.feeRate,
                 ),
               );
 
-              const tokenSoldEvent = receipt.events?.find(
-                (item) => item.event === "Transfer",
+              const event = receipt.events?.find(
+                (item) => item.event === EvenName.Transfer,
               ) as TransferEvent;
-
-              expect(tokenSoldEvent).not.undefined;
-
-              const { from, to, amount, feeRate, timestamp } = tokenSoldEvent?.args;
-
+              expect(event).not.undefined;
+              const { from, to, gameIdHash, amount, feeRate, timestamp } = event?.args;
               expect(from).equal(this.user1.address);
               expect(to).equal(this.user2.address);
+              expect(gameIdHash).equal(seedData.gameIdHash0);
               expect(amount).equal(seedData.lock);
               expect(feeRate).equal(seedData.feeRate);
               expect(timestamp).closeTo(getNow(), seedData.timeDelta);
             });
 
-            it("should throw error when owner tries to transfer from user who has no certain amount of locked funds", async function () {
+            it("should throw error when owner tries to transfer witrh incorrect fee rate", async function () {
               await expect(
                 this.ownerPetoBetContract.transfer(
                   this.user1.address,
                   this.user2.address,
-                  seedData.deposit1,
-                  seedData.feeRate,
-                ),
-              ).rejectedWith(vmEsceptionText(errorMessage.lockedFundsFromAccount));
-            });
-
-            it("should throw error when owner tries to transfer from user who has no certain amount of locked funds", async function () {
-              await expect(
-                this.ownerPetoBetContract.transfer(
-                  this.user1.address,
-                  this.user2.address,
-                  seedData.lock,
+                  seedData.gameId0,
                   seedData.incorrectFeeRate,
                 ),
               ).rejectedWith(vmEsceptionText(errorMessage.feeRateMustBeLess100));
             });
 
-            describe("owner transfered funds from user1 to user2 with some interest", () => {
+            describe("user2 transfered funds from user1 to user2 using signature", () => {
               beforeEach(async function () {
-                await this.ownerPetoBetContract.transfer(
+                // await this.ownerPetoBetContract.transfer(
+                //   this.user1.address,
+                //   this.user2.address,
+                //   seedData.gameId0,
+                //   seedData.feeRate,
+                // );
+
+                const signature = await signMessageForTransferEx(this);
+
+                this.user2PetoBetContract.transferSig(
                   this.user1.address,
                   this.user2.address,
-                  seedData.lock,
+                  seedData.gameId0,
                   seedData.feeRate,
+                  signature,
                 );
               });
 
@@ -497,11 +627,11 @@ export function shouldBehaveCorrectFunding(): void {
                   this.ownerPetoBetContract.withdrawFee(this.owner.address, seedData.feeBalance),
                 );
 
-                const tokenSoldEvent = receipt.events?.find(
-                  (item) => item.event === "WithdrawFee",
+                const event = receipt.events?.find(
+                  (item) => item.event === EvenName.WithdrawFee,
                 ) as WithdrawFeeEvent;
-                expect(tokenSoldEvent).not.undefined;
-                const { account, amount, timestamp } = tokenSoldEvent?.args;
+                expect(event).not.undefined;
+                const { account, amount, timestamp } = event?.args;
                 expect(account).equal(this.owner.address);
                 expect(amount).equal(seedData.feeBalance);
                 expect(timestamp).closeTo(getNow(), seedData.timeDelta);

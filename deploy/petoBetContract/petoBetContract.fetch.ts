@@ -16,9 +16,9 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const { ownerPetoBetContract } = await getPetoBetContext(users, petoBetAddress);
 
     const user1Balance = await ownerPetoBetContract.balanceOf(user1.address);
-    printUserBalance(user1Balance);
+    printUserBalance(user1Balance, "user1");
     const user2Balance = await ownerPetoBetContract.balanceOf(user2.address);
-    printUserBalance(user2Balance);
+    printUserBalance(user2Balance, "user2");
     const feeBalance = await ownerPetoBetContract.getFeeBalance();
     printFeeBalance(feeBalance);
   }, hre);

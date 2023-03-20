@@ -7,6 +7,7 @@ import {
 } from "constants/addresses";
 import { ethers, upgrades } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { PetoBetContextBase } from "test/petoBetContract/types";
 import { PetoBetContract } from "typechain-types/contracts/PetoBetContract";
 import { PetoInventoryContract } from "typechain-types/contracts/PetoInventoryContract";
 import { PetoBetContract__factory } from "typechain-types/factories/contracts/PetoBetContract__factory";
@@ -19,8 +20,8 @@ const OPTIONS: DeployProxyOptions = {
 };
 
 export function getAddresses(network: keyof DeployNetworks): Addresses {
-  const petoBetAddress = CONTRACTS.PETO_BET[network];
-  const petoInventoryAddress = CONTRACTS.PETO_INVENTORY[network];
+  const petoBetAddress = CONTRACTS.PetoBet[network];
+  const petoInventoryAddress = CONTRACTS.PetoInventory[network];
   return {
     petoBetAddress,
     petoInventoryAddress,
@@ -32,15 +33,19 @@ export function getAddressesFromHre(hre: HardhatRuntimeEnvironment) {
 }
 
 export async function getUsers(): Promise<Users> {
-  const [owner, user1, user2] = await ethers.getSigners();
+  const [owner, user1, user2, user3] = await ethers.getSigners();
   return {
     owner,
     user1,
     user2,
+    user3,
   };
 }
 
-export async function getPetoBetContext(users: Users, createObj?: string) {
+export async function getPetoBetContext(
+  users: Users,
+  createObj?: string,
+): Promise<PetoBetContextBase> {
   const { owner, user1, user2 } = users;
 
   const petoBetFactory = <PetoBetContract__factory>(
@@ -62,6 +67,7 @@ export async function getPetoBetContext(users: Users, createObj?: string) {
   const user2PetoBetContract = ownerPetoBetContract.connect(user2);
 
   return {
+    ...users,
     petoBetFactory,
     ownerPetoBetContract,
     user1PetoBetContract,

@@ -2,10 +2,11 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 import _ from "lodash";
 import { seedData } from "seeds";
+import { v4 as uuidv4 } from "uuid";
 
 import { PetoBetContextBase } from "./types";
 
-interface BalanceObject {
+export interface BalanceObject {
   getBalance: () => Promise<BigNumber>;
 }
 
@@ -21,13 +22,19 @@ export async function checkTotalBalance(that: PetoBetContextBase) {
 }
 
 export async function checkTransfer(that: PetoBetContextBase, iterationNumber: number) {
-  await that.user1PetoBetContract.lock(that.user1.address, seedData.lock);
-  await that.user2PetoBetContract.lock(that.user2.address, seedData.lock);
+  const gameId = uuidv4();
+
+  await that.ownerPetoBetContract.pairLock(
+    that.user1.address,
+    that.user2.address,
+    gameId,
+    seedData.lock,
+  );
 
   await that.ownerPetoBetContract.transfer(
     that.user1.address,
     that.user2.address,
-    seedData.lock,
+    gameId,
     seedData.feeRate,
   );
 

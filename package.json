@@ -16,12 +16,14 @@
     "deploy:bet:fetch": "hardhat deploy --tags PetoBetContract:fetch",
     "deploy:bet:deposit1": "hardhat deploy --tags PetoBetContract:deposit1",
     "deploy:bet:deposit2": "hardhat deploy --tags PetoBetContract:deposit2",
-    "deploy:bet:lock1": "hardhat deploy --tags PetoBetContract:lock1",
-    "deploy:bet:lock2": "hardhat deploy --tags PetoBetContract:lock2",
     "deploy:bet:pair-lock": "hardhat deploy --tags PetoBetContract:pair-lock",
+    "deploy:bet:signature": "hardhat deploy --tags PetoBetContract:signature",
     "deploy:bet:transfer": "hardhat deploy --tags PetoBetContract:transfer",
+    "deploy:bet:transfer-sig": "hardhat deploy --tags PetoBetContract:transfer-sig",
     "deploy:bet:withdraw1": "hardhat deploy --tags PetoBetContract:withdraw1",
     "deploy:bet:withdraw-all": "hardhat deploy --tags PetoBetContract:withdraw-all",
+    "deploy:bet:smoke-test": "hardhat deploy --tags PetoBetContract:smoke-test",
+    "deploy:bet:publish-abi": "hardhat deploy --tags PetoBetContract:publish-abi",
     "deploy:inv:proxy": "hardhat deploy --tags PetoInventoryContract:proxy",
     "deploy:inv:verify": "hardhat deploy --tags PetoInventoryContract:verify",
     "deploy:inv:init": "hardhat deploy --tags PetoInventoryContract:init",
@@ -63,6 +65,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.10",
+    "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "app-root-path": "^3.1.0",
@@ -95,7 +98,8 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.1",
     "typechain": "^8.1.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.3",
+    "uuid": "^9.0.0"
   },
   "files": [
     "/contracts"

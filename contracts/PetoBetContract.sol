@@ -7,9 +7,13 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./PayableContext.sol";
+import "./SignatureBase.sol";
+
+import "hardhat/console.sol";
 
 contract PetoBetContract is
     PayableContext,
+    SignatureBase,
     Initializable,
     OwnableUpgradeable,
     ReentrancyGuardUpgradeable,
@@ -27,9 +31,11 @@ contract PetoBetContract is
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-    //Variables, modifiers, events------------------------
+    //Variables, structs, modifiers, events------------------------
 
     mapping(address => FundItem) private _balances;
+
+    mapping(bytes32 => GameItem) private _gameIds;
 
     uint256 feeBalance;
 
@@ -38,6 +44,13 @@ contract PetoBetContract is
     struct FundItem {
         uint256 free;
         uint256 locked;
+    }
+
+    struct GameItem {
+        address account1;
+        address account2;
+        uint256 amount;
+        bool transfered;
     }
 
     modifier onlySufficentFunds(address account, uint256 amount) {
@@ -50,11 +63,18 @@ contract PetoBetContract is
 
     event Withdraw(address indexed account, uint256 amount, uint32 timestamp);
 
-    event Lock(address indexed account, uint256 amount, uint32 timestamp);
+    event PairLock(
+        address indexed account1,
+        address indexed account2,
+        bytes32 indexed gameIdHash,
+        uint256 amount,
+        uint32 timestamp
+    );
 
     event Transfer(
         address indexed from,
         address indexed to,
+        bytes32 indexed gameIdHash,
         uint256 amount,
         uint256 feeRate,
         uint32 timestamp
@@ -95,25 +115,63 @@ contract PetoBetContract is
         return _balances[account];
     }
 
-    function lock(address account, uint256 amount) public onlySufficentFunds(account, amount) {
+    function lock(address account, uint256 amount) private onlySufficentFunds(account, amount) {
         FundItem storage fund = _balances[account];
         fund.free -= amount;
         fund.locked += amount;
-        emit Lock(account, amount, uint32(block.timestamp));
     }
 
-    function pairLock(address account1, address account2, uint256 amount) external onlyOwner {
+    function getGameIdHash(string memory gameId) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(gameId));
+    }
+
+    function getGameItem(string memory gameId) public view returns (bytes32, GameItem memory) {
+        bytes32 gameIdHash = getGameIdHash(gameId);
+        return (gameIdHash, _gameIds[gameIdHash]);
+    }
+
+    function pairLock(
+        address account1,
+        address account2,
+        string memory gameId,
+        uint256 amount
+    ) external onlyOwner {
+        (bytes32 gameIdHash, GameItem memory gameItem) = getGameItem(gameId);
+        require(
+            gameItem.account1 == address(0) && gameItem.account2 == address(0),
+            "This gameId was used before"
+        );
+
+        _gameIds[gameIdHash] = GameItem(account1, account2, amount, false);
+
         lock(account1, amount);
         lock(account2, amount);
+
+        emit PairLock(account1, account2, gameIdHash, amount, uint32(block.timestamp));
     }
 
-    function transfer(
-        address from,
-        address to,
-        uint256 amount,
-        uint256 feeRate
-    ) external onlyOwner {
+    function _transfer(address from, address to, string memory gameId, uint256 feeRate) internal {
         require(feeRate < 100 * DECIMAL_FACTOR, "feeRate must be less 100");
+
+        (bytes32 gameIdHash, GameItem memory gameItem) = getGameItem(gameId);
+        require(
+            gameItem.account1 != address(0) && gameItem.account2 != address(0),
+            "This gameId does not exist"
+        );
+
+        require(!gameItem.transfered, "This gameId was transfered before");
+
+        require(
+            from == gameItem.account1 || from == gameItem.account2,
+            "FROM account wasn't verified by gameId"
+        );
+
+        require(
+            to == gameItem.account1 || to == gameItem.account2,
+            "TO account wasn't verified by gameId"
+        );
+
+        uint256 amount = gameItem.amount;
 
         FundItem storage fromFund = _balances[from];
         require(
@@ -135,7 +193,32 @@ contract PetoBetContract is
         toFund.locked -= amount;
         toFund.free += amount + win;
 
-        emit Transfer(from, to, amount, feeRate, uint32(block.timestamp));
+        GameItem storage existGameItem = _gameIds[gameIdHash];
+        existGameItem.transfered = true;
+
+        emit Transfer(from, to, gameIdHash, amount, feeRate, uint32(block.timestamp));
+    }
+
+    function transfer(
+        address from,
+        address to,
+        string memory gameId,
+        uint256 feeRate
+    ) external onlyOwner {
+        _transfer(from, to, gameId, feeRate);
+    }
+
+    function transferSig(
+        address from,
+        address to,
+        string memory gameId,
+        uint256 feeRate,
+        bytes memory signature
+    ) external {
+        bytes32 message = withPrefix(keccak256(abi.encodePacked(from, to, gameId, feeRate)));
+        require(recoverSigner(message, signature) == owner(), "Invalid signature");
+
+        _transfer(from, to, gameId, feeRate);
     }
 
     function withdrawFee(address to, uint256 amount) external onlyOwner nonReentrant {

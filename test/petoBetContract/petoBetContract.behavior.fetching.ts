@@ -23,5 +23,14 @@ export function shouldBehaveCorrectFetching(): void {
     it("should return correct fee balance", async function () {
       expect(await this.ownerPetoBetContract.getFeeBalance()).equal(seedData.zero);
     });
+
+    it("should return correct hash of gameId", async function () {
+      expect(await this.ownerPetoBetContract.getGameIdHash(seedData.gameId0)).equal(
+        seedData.gameIdHash0,
+      );
+      expect(await this.ownerPetoBetContract.getGameIdHash(seedData.gameId1)).equal(
+        seedData.gameIdHash1,
+      );
+    });
   });
 }
