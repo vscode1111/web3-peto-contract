@@ -168,7 +168,7 @@ export function shouldBehaveCorrectFunding(): void {
             expect(timestamp).closeTo(getNow(), seedData.timeDelta);
           });
 
-          it("should throw error when owner  tries to call pairLock twice", async function () {
+          it("should throw error when owner tries to call pairLock twice", async function () {
             await this.ownerPetoBetContract.pairLock(
               this.user1.address,
               this.user2.address,
@@ -195,6 +195,18 @@ export function shouldBehaveCorrectFunding(): void {
                 seedData.lock,
               ),
             ).rejectedWith(vmEsceptionText(commonErrorMessage.onlyOwner));
+          });
+
+          it("should throw error when user1 tries to call pairUnlock without permissio", async function () {
+            await expect(this.user1PetoBetContract.pairUnlock(seedData.gameId0)).rejectedWith(
+              vmEsceptionText(commonErrorMessage.onlyOwner),
+            );
+          });
+
+          it("should throw error when user1 tries to call pairUnlock with non-exist gameId", async function () {
+            await expect(this.ownerPetoBetContract.pairUnlock(seedData.gameId0)).rejectedWith(
+              vmEsceptionText(errorMessage.thisGameDoesNotExist),
+            );
           });
 
           describe("owner locked funds of user1 and user2", () => {
@@ -517,6 +529,56 @@ export function shouldBehaveCorrectFunding(): void {
               ).rejectedWith(vmEsceptionText(errorMessage.feeRateMustBeLess100));
             });
 
+            it("check event when call pairUnlock", async function () {
+              const receipt = await waitTx(this.ownerPetoBetContract.pairUnlock(seedData.gameId0));
+
+              const event = receipt.events?.find(
+                (item) => item.event === EvenName.PairUnlock,
+              ) as PairLockEvent;
+              expect(event).not.undefined;
+              const { account1, account2, gameIdHash, amount, timestamp } = event?.args;
+              expect(account1).equal(this.user1.address);
+              expect(account2).equal(this.user2.address);
+              expect(gameIdHash).equal(seedData.gameIdHash0);
+              expect(amount).equal(seedData.lock);
+              expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+            });
+
+            describe("owner unlocked funds of user1 and user2 ", () => {
+              beforeEach(async function () {
+                await this.ownerPetoBetContract.pairUnlock(seedData.gameId0);
+              });
+
+              it(INITIAL_POSITIVE_CHECK_TEST_TITLE, async function () {
+                expect(await this.user1.getBalance()).closeTo(
+                  seedData.accountInitBalance.sub(seedData.deposit1),
+                  seedData.error,
+                );
+                expect(await this.user2.getBalance()).closeTo(
+                  seedData.accountInitBalance.sub(seedData.deposit2),
+                  seedData.error,
+                );
+
+                const user1Balance = await this.ownerPetoBetContract.balanceOf(this.user1.address);
+                expect(user1Balance.free).equal(seedData.deposit1);
+                expect(user1Balance.locked).equal(seedData.zero);
+
+                const user2Balance = await this.ownerPetoBetContract.balanceOf(this.user2.address);
+                expect(user2Balance.free).equal(seedData.deposit2);
+                expect(user2Balance.locked).equal(seedData.zero);
+
+                expect(await this.ownerPetoBetContract.getFeeBalance()).equal(seedData.zero);
+                expect(await this.ownerPetoBetContract.getBalance()).equal(seedData.deposit12);
+                await checkTotalBalance(this);
+              });
+
+              it("check call unlocked twice", async function () {
+                await expect(this.ownerPetoBetContract.pairUnlock(seedData.gameId0)).rejectedWith(
+                  vmEsceptionText(errorMessage.thisGameIdWasTranferedBefore),
+                );
+              });
+            });
+
             describe("user2 transfered funds from user1 to user2 using signature", () => {
               beforeEach(async function () {
                 // await this.ownerPetoBetContract.transfer(
@@ -528,7 +590,7 @@ export function shouldBehaveCorrectFunding(): void {
 
                 const signature = await signMessageForTransferEx(this);
 
-                this.user2PetoBetContract.transferSig(
+                await this.user2PetoBetContract.transferSig(
                   this.user1.address,
                   this.user2.address,
                   seedData.gameId0,

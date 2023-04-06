@@ -34,11 +34,7 @@ export const seedData = {
   error: toWei(0.01),
   bigError: toWei(0.3),
   timeDelta: 300,
-  // gameId0: "733416dd-d12f-4fb7-9438-7835abe717b6",
-  // gameId1: "733efc1e-0115-4f2c-b8a2-9b83e28b616f",
-  // gameIdHash0: "0x2ae807746a02e6bb9d4edbbc0e1b276ae2b9af6474903cb3b8778a094b8fb6f8",
-  // gameIdHash1: "0x8553b156ad297e38d262f2e9427b7f104ce9cdf47ba3afb8e167e710f8a8bcc6",
-  gameIdForce: "62813e9b-bde7-40bf-adde-4cf3c3d76004",
+  gameIdForce: "c21c2dd4-3d72-4208-974e-b97273bf1e39",
   signatureForce:
     "0x6ca1f91cf29e4fb5ed57a194cf64337a6f83b6da8cbd4cd8b040c19bd9b3b0f660f55fd22bb484ab9c60de6f5a54dc5483e80cb51e2877e86c325fb31123bbdb1c",
   gameId0,

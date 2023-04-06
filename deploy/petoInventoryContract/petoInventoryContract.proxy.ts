@@ -6,14 +6,23 @@ import { getPetoInventoryContext, getUsers } from "utils";
 
 import { deployData } from "./deployData";
 
+const IS_OWNER_DEPLOY = true;
+
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
     console.log(`${PETO_INVENTORY_CONTRACT_NAME} proxy is deploying...`);
 
-    const { ownerPetoInventoryContract } = await getPetoInventoryContext(await getUsers(), {
-      name: deployData.name,
-      symbol: deployData.symbol,
-    });
+    const users = await getUsers();
+    const { owner, user1 } = users;
+
+    const { ownerPetoInventoryContract } = await getPetoInventoryContext(
+      users,
+      {
+        name: deployData.name,
+        symbol: deployData.symbol,
+      },
+      IS_OWNER_DEPLOY ? owner : user1,
+    );
 
     await ownerPetoInventoryContract.deployed();
     console.log(

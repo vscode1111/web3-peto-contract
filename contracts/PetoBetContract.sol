@@ -71,6 +71,14 @@ contract PetoBetContract is
         uint32 timestamp
     );
 
+    event PairUnlock(
+        address indexed account1,
+        address indexed account2,
+        bytes32 indexed gameIdHash,
+        uint256 amount,
+        uint32 timestamp
+    );
+
     event Transfer(
         address indexed from,
         address indexed to,
@@ -117,8 +125,16 @@ contract PetoBetContract is
 
     function lock(address account, uint256 amount) private onlySufficentFunds(account, amount) {
         FundItem storage fund = _balances[account];
+        require(fund.free >= amount, "Free fund must be equal or greater then required amount");
         fund.free -= amount;
         fund.locked += amount;
+    }
+
+    function unlock(address account, uint256 amount) private onlySufficentFunds(account, amount) {
+        FundItem storage fund = _balances[account];
+        require(fund.locked >= amount, "Locked fund must be equal or greater then required amount");
+        fund.free += amount;
+        fund.locked -= amount;
     }
 
     function getGameIdHash(string memory gameId) public pure returns (bytes32) {
@@ -150,16 +166,45 @@ contract PetoBetContract is
         emit PairLock(account1, account2, gameIdHash, amount, uint32(block.timestamp));
     }
 
-    function _transfer(address from, address to, string memory gameId, uint256 feeRate) internal {
-        require(feeRate < 100 * DECIMAL_FACTOR, "feeRate must be less 100");
-
-        (bytes32 gameIdHash, GameItem memory gameItem) = getGameItem(gameId);
+    function checkIfGameItemExist(GameItem memory gameItem) private pure {
         require(
             gameItem.account1 != address(0) && gameItem.account2 != address(0),
             "This gameId does not exist"
         );
+    }
 
+    function checkIfGameItemTransfered(GameItem memory gameItem) private pure {
         require(!gameItem.transfered, "This gameId was transfered before");
+    }
+
+    function setGameItemTransfered(bytes32 gameIdHash) private {
+        GameItem storage existGameItem = _gameIds[gameIdHash];
+        existGameItem.transfered = true;
+    }
+
+    function pairUnlock(string memory gameId) external onlyOwner {
+        (bytes32 gameIdHash, GameItem memory gameItem) = getGameItem(gameId);
+        checkIfGameItemExist(gameItem);
+        checkIfGameItemTransfered(gameItem);
+
+        address account1 = gameItem.account1;
+        address account2 = gameItem.account2;
+        uint256 amount = gameItem.amount;
+
+        unlock(account1, amount);
+        unlock(account2, amount);
+
+        setGameItemTransfered(gameIdHash);
+
+        emit PairUnlock(account1, account2, gameIdHash, amount, uint32(block.timestamp));
+    }
+
+    function _transfer(address from, address to, string memory gameId, uint256 feeRate) internal {
+        require(feeRate < 100 * DECIMAL_FACTOR, "feeRate must be less 100");
+
+        (bytes32 gameIdHash, GameItem memory gameItem) = getGameItem(gameId);
+        checkIfGameItemExist(gameItem);
+        checkIfGameItemTransfered(gameItem);
 
         require(
             from == gameItem.account1 || from == gameItem.account2,
@@ -193,8 +238,7 @@ contract PetoBetContract is
         toFund.locked -= amount;
         toFund.free += amount + win;
 
-        GameItem storage existGameItem = _gameIds[gameIdHash];
-        existGameItem.transfered = true;
+        setGameItemTransfered(gameIdHash);
 
         emit Transfer(from, to, gameIdHash, amount, feeRate, uint32(block.timestamp));
     }

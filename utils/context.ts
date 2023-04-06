@@ -1,3 +1,4 @@
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { DeployProxyOptions } from "@openzeppelin/hardhat-upgrades/dist/utils";
 import { getNetworkName } from "common";
 import {
@@ -45,20 +46,19 @@ export async function getUsers(): Promise<Users> {
 export async function getPetoBetContext(
   users: Users,
   createObj?: string,
+  ownerForce?: SignerWithAddress,
 ): Promise<PetoBetContextBase> {
   const { owner, user1, user2 } = users;
 
   const petoBetFactory = <PetoBetContract__factory>(
-    await ethers.getContractFactory(PETO_BET_CONTRACT_NAME)
+    (await ethers.getContractFactory(PETO_BET_CONTRACT_NAME)).connect(ownerForce ?? owner)
   );
 
   let ownerPetoBetContract: PetoBetContract;
 
   if (typeof createObj === "string") {
     const contractAddress = createObj as string;
-    ownerPetoBetContract = <PetoBetContract>(
-      await petoBetFactory.connect(owner).attach(contractAddress)
-    );
+    ownerPetoBetContract = <PetoBetContract>petoBetFactory.attach(contractAddress);
   } else {
     ownerPetoBetContract = <PetoBetContract>await upgrades.deployProxy(petoBetFactory, [], OPTIONS);
   }
@@ -78,11 +78,12 @@ export async function getPetoBetContext(
 export async function getPetoInventoryContext(
   users: Users,
   createObj: string | { name: string; symbol: string },
+  ownerForce?: SignerWithAddress,
 ) {
   const { owner, user1, user2 } = users;
 
   const petoInventoryFactory = <PetoInventoryContract__factory>(
-    await ethers.getContractFactory(PETO_INVENTORY_CONTRACT_NAME)
+    (await ethers.getContractFactory(PETO_INVENTORY_CONTRACT_NAME)).connect(ownerForce ?? owner)
   );
 
   let ownerPetoInventoryContract: PetoInventoryContract;
@@ -90,7 +91,7 @@ export async function getPetoInventoryContext(
   if (typeof createObj === "string") {
     const contractAddress = createObj as string;
     ownerPetoInventoryContract = <PetoInventoryContract>(
-      await petoInventoryFactory.connect(owner).attach(contractAddress)
+      petoInventoryFactory.attach(contractAddress)
     );
   } else {
     ownerPetoInventoryContract = <PetoInventoryContract>(

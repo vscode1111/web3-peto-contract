@@ -29,7 +29,6 @@ export function shouldBehaveCorrectFetching(): void {
 
     it("should call getTokenCount correctly", async function () {
       await initCollectionsReal(this.ownerPetoInventoryContract);
-      // console.log(111, testValue.tokenCount);
       expect(await this.ownerPetoInventoryContract.getTokenCount()).equal(testData.tokenCount);
     });
   });

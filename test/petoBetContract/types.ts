@@ -19,6 +19,7 @@ declare module "mocha" {
 export enum EvenName {
   Deposit = "Deposit",
   PairLock = "PairLock",
+  PairUnlock = "PairUnlock",
   Transfer = "Transfer",
   Withdraw = "Withdraw",
   WithdrawFee = "WithdrawFee",
