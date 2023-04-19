@@ -1,4 +1,4 @@
-import { getPetoBetContext, getUsers } from "utils";
+import { getPetoBetContext, getUsers } from "@utils";
 
 import { PetoBetContextBase } from "./types";
 

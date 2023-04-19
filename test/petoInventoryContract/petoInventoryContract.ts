@@ -1,5 +1,5 @@
+import { PETO_INVENTORY_CONTRACT_NAME } from "@constants/addresses";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { PETO_INVENTORY_CONTRACT_NAME } from "constants/addresses";
 
 import { shouldBehaveCorrectFetching } from "./petoInventoryContract.behavior.fetching";
 import { shouldBehaveCorrectMinting } from "./petoInventoryContract.behavior.minting";

@@ -1,9 +1,9 @@
-import { callWithTimerHre } from "common";
-import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
+import { callWithTimerHre } from "@common";
+import { PETO_BET_CONTRACT_NAME } from "@constants";
+import { betSeedData } from "@seeds";
+import { getAddressesFromHre, getPetoBetContext, getUsers, signMessageForTransferEx } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { betSeedData } from "seeds";
-import { getAddressesFromHre, getPetoBetContext, getUsers, signMessageForTransferEx } from "utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {

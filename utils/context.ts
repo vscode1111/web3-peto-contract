@@ -1,19 +1,15 @@
+import { getNetworkName } from "@common";
+import { CONTRACTS, PETO_BET_CONTRACT_NAME, PETO_INVENTORY_CONTRACT_NAME } from "@constants";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { DeployProxyOptions } from "@openzeppelin/hardhat-upgrades/dist/utils";
-import { getNetworkName } from "common";
-import {
-  CONTRACTS,
-  PETO_BET_CONTRACT_NAME,
-  PETO_INVENTORY_CONTRACT_NAME,
-} from "constants/addresses";
+import { PetoBetContextBase } from "@test/petoBetContract/types";
+import { PetoBetContract } from "@typechain-types/contracts/PetoBetContract";
+import { PetoInventoryContract } from "@typechain-types/contracts/PetoInventoryContract";
+import { PetoBetContract__factory } from "@typechain-types/factories/contracts/PetoBetContract__factory";
+import { PetoInventoryContract__factory } from "@typechain-types/factories/contracts/PetoInventoryContract__factory";
+import { Addresses, DeployNetworks, Users } from "@types";
 import { ethers, upgrades } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { PetoBetContextBase } from "test/petoBetContract/types";
-import { PetoBetContract } from "typechain-types/contracts/PetoBetContract";
-import { PetoInventoryContract } from "typechain-types/contracts/PetoInventoryContract";
-import { PetoBetContract__factory } from "typechain-types/factories/contracts/PetoBetContract__factory";
-import { PetoInventoryContract__factory } from "typechain-types/factories/contracts/PetoInventoryContract__factory";
-import { Addresses, DeployNetworks, Users } from "types";
 
 const OPTIONS: DeployProxyOptions = {
   initializer: "initialize",

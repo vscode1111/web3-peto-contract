@@ -1,13 +1,13 @@
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
+import { DeployNetworks } from "@types";
 import { config as dotenvConfig } from "dotenv";
 import "hardhat-deploy";
 import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import "tsconfig-paths/register";
-import { DeployNetworks } from "types";
 
 import { getEnv } from "./common/config";
 

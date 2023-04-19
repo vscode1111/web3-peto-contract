@@ -1,8 +1,7 @@
+import { INITIAL_POSITIVE_CHECK_TEST_TITLE, vmEsceptionText } from "@common";
+import { invSeedData } from "@seeds";
+import { initCollections, invTestData } from "@test";
 import { expect } from "chai";
-import { INITIAL_POSITIVE_CHECK_TEST_TITLE, vmEsceptionText } from "common";
-import { invSeedData } from "seeds";
-import { initCollectionsReal } from "test";
-import { invTestData } from "test/petoInventoryContract/testData";
 
 import { invErrorMessage } from "./testData";
 
@@ -13,7 +12,7 @@ export function shouldBehaveCorrectTransfer(): void {
   describe("fetching", () => {
     describe("initCollectionsReal", () => {
       beforeEach(async function () {
-        await initCollectionsReal(this.ownerPetoInventoryContract);
+        await initCollections(this.ownerPetoInventoryContract);
       });
 
       it("should call safeTransferFrom(3 params) correctly", async function () {

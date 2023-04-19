@@ -1,8 +1,8 @@
+import { DeployNetworks } from "@types";
 import { ContractReceipt, ContractTransaction } from "ethers";
 import { ethers } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import _ from "lodash";
-import { DeployNetworks } from "types";
 
 import { DiffArray } from "./DiffArray";
 import { toNumber } from "./converts";

@@ -1,20 +1,20 @@
-import { expect } from "chai";
 import {
   INITIAL_POSITIVE_CHECK_TEST_TITLE,
   commonErrorMessage,
   getNow,
   vmEsceptionText,
   waitTx,
-} from "common";
-import { betSeedData } from "seeds";
+} from "@common";
+import { betSeedData } from "@seeds";
 import {
   DepositEvent,
   PairLockEvent,
   TransferEvent,
   WithdrawEvent,
   WithdrawFeeEvent,
-} from "typechain-types/contracts/PetoBetContract";
-import { signMessageForTransferEx } from "utils";
+} from "@typechain-types/contracts/PetoBetContract";
+import { signMessageForTransferEx } from "@utils";
+import { expect } from "chai";
 
 import { betErrorMessage } from "./testData";
 import { EvenName } from "./types";

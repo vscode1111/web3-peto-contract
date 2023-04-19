@@ -1,6 +1,6 @@
-import { Fixture } from "test/types";
-import { PetoInventoryContract } from "typechain-types/contracts/PetoInventoryContract";
-import { Users } from "types";
+import { Fixture } from "@test";
+import { PetoInventoryContract } from "@typechain-types/contracts/PetoInventoryContract";
+import { Users } from "@types";
 
 export interface PetoInventoryContextBase extends Users {
   ownerPetoInventoryContract: PetoInventoryContract;

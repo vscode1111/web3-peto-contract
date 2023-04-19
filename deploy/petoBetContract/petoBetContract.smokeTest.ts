@@ -1,9 +1,9 @@
-import { callWithTimerHre } from "common";
-import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
+import { callWithTimerHre } from "@common";
+import { PETO_BET_CONTRACT_NAME } from "@constants";
+import { smokeTest } from "@test/petoBetContract/petoBetContract.behavior.smoke-test";
+import { getAddressesFromHre, getPetoBetContext, getUsers } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { smokeTest } from "test/petoBetContract/petoBetContract.behavior.smoke-test";
-import { getAddressesFromHre, getPetoBetContext, getUsers } from "utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {

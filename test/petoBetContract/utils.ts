@@ -1,7 +1,7 @@
+import { betSeedData } from "@seeds";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import _ from "lodash";
-import { betSeedData } from "seeds";
 import { v4 as uuidv4 } from "uuid";
 
 import { PetoBetContextBase } from "./types";

@@ -1,5 +1,5 @@
-import { deployData } from "deploy/petoInventoryContract/deployData";
-import { getPetoInventoryContext, getUsers } from "utils";
+import { deployData } from "@deploy/petoInventoryContract/deployData";
+import { getPetoInventoryContext, getUsers } from "@utils";
 
 import { PetoInventoryContextBase } from "./types";
 

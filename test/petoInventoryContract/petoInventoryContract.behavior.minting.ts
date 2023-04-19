@@ -1,6 +1,6 @@
+import { initCollections } from "@test";
+import { invTestData } from "@test/petoInventoryContract/testData";
 import { expect } from "chai";
-import { invTestData } from "test/petoInventoryContract/testData";
-import { initCollectionsReal as initCollections } from "test/utils";
 
 export function shouldBehaveCorrectMinting(): void {
   describe("minting", () => {
@@ -13,14 +13,14 @@ export function shouldBehaveCorrectMinting(): void {
       });
 
       it("should procced the minting", async function () {
-        await this.ownerPetoInventoryContract.safeMint(this.owner.address);
+        await this.ownerPetoInventoryContract.mint(this.owner.address);
         let tokens = await this.ownerPetoInventoryContract.fetchTokens();
         expect(tokens.length).eq(1);
         expect(tokens[0].tokenId).eq(0);
         expect(tokens[0].owner).eq(this.owner.address);
         expect(await this.ownerPetoInventoryContract.tokenURI(0)).eq(`${invTestData.uri}0.json`);
 
-        await this.ownerPetoInventoryContract.safeMint(this.owner.address);
+        await this.ownerPetoInventoryContract.mint(this.owner.address);
         tokens = await this.ownerPetoInventoryContract.fetchTokens();
         expect(tokens.length).eq(2);
         expect(tokens[0].tokenId).eq(0);
@@ -32,7 +32,7 @@ export function shouldBehaveCorrectMinting(): void {
       });
 
       it("should procced the batch minting", async function () {
-        await this.ownerPetoInventoryContract.safeMintBatch([
+        await this.ownerPetoInventoryContract.mintBatch([
           this.owner.address,
           this.user1.address,
           this.user2.address,

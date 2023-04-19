@@ -1,4 +1,4 @@
-import { DeployNetworks } from "types";
+import { DeployNetworks } from "@types";
 
 export const PETO_BET_CONTRACT_NAME = "PetoBetContract";
 export const PETO_INVENTORY_CONTRACT_NAME = "PetoInventoryContract";
@@ -16,7 +16,7 @@ export const CONTRACTS: Record<ContractList, DeployNetworks> = {
     // bsc: "0xE9894AF13eEF1e761d4a7Af759609c2897103936", //2
     // polygon: "0x1AC18c75fFBCcc172F7417730E1a706c0c00524f", //b1
     // polygon: "0xB48a9D74014FD2af4D75E438c025169a08d4aF29", //b2
-    polygon: "0x991e4d8596c09A70Da8F72dF902e452142D84B79", //test
+    polygon: "0x1d14aD3A339845837F1A510746E98A81aE90Ea8F", //test
   },
   PetoBet: {
     opera: "0xd4971E5a6F0f7c3120136E2fD2f4bc251BfC83A6",

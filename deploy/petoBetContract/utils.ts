@@ -1,6 +1,6 @@
-import { printBigNumber } from "common";
+import { printBigNumber } from "@common";
+import { PetoBetContract } from "@typechain-types/contracts/PetoBetContract";
 import { BigNumber } from "ethers";
-import { PetoBetContract } from "typechain-types/contracts/PetoBetContract";
 
 export function printUserBalance(userBalance: PetoBetContract.FundItemStructOutput, name = "user") {
   console.log(

@@ -1,16 +1,16 @@
-import { expect } from "chai";
-import { attempt, getNow, waitTx } from "common";
-import { printUserBalance } from "deploy/petoBetContract/utils";
-import { BigNumber } from "ethers";
-import { betSeedData } from "seeds";
+import { attempt, getNow, waitTx } from "@common";
+import { printUserBalance } from "@deploy/petoBetContract/utils";
+import { betSeedData } from "@seeds";
 import {
   DepositEvent,
   PairLockEvent,
   TransferEvent,
   WithdrawEvent,
   WithdrawFeeEvent,
-} from "typechain-types/contracts/PetoBetContract";
-import { signMessageForTransferEx } from "utils";
+} from "@typechain-types/contracts/PetoBetContract";
+import { signMessageForTransferEx } from "@utils";
+import { expect } from "chai";
+import { BigNumber } from "ethers";
 
 import { EvenName, PetoBetContextBase } from "./types";
 import { BalanceObject, getTotalBalance } from "./utils";

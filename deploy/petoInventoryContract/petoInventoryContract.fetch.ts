@@ -1,8 +1,8 @@
-import { callWithTimerHre } from "common";
-import { PETO_INVENTORY_CONTRACT_NAME } from "constants/addresses";
+import { callWithTimerHre } from "@common";
+import { PETO_INVENTORY_CONTRACT_NAME } from "@constants";
+import { getAddressesFromHre, getPetoInventoryContext, getUsers } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { getAddressesFromHre, getPetoInventoryContext, getUsers } from "utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {

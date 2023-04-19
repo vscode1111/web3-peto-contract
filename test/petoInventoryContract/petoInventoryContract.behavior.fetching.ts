@@ -1,7 +1,7 @@
+import { deployData } from "@deploy/petoInventoryContract/deployData";
+import { invTestData } from "@test/petoInventoryContract/testData";
+import { initCollections } from "@test/utils";
 import { expect } from "chai";
-import { deployData } from "deploy/petoInventoryContract/deployData";
-import { invTestData } from "test/petoInventoryContract/testData";
-import { initCollectionsReal } from "test/utils";
 
 export function shouldBehaveCorrectFetching(): void {
   describe("fetching", () => {
@@ -12,7 +12,7 @@ export function shouldBehaveCorrectFetching(): void {
 
     describe("initCollectionsReal", () => {
       beforeEach(async function () {
-        await initCollectionsReal(this.ownerPetoInventoryContract);
+        await initCollections(this.ownerPetoInventoryContract);
       });
 
       it("should call fetchTokens correctly", async function () {

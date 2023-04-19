@@ -1,6 +1,6 @@
+import { callWithTimerHre } from "@common";
+import { PETO_BET_CONTRACT_NAME } from "@constants";
 import appRoot from "app-root-path";
-import { callWithTimerHre } from "common";
-import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
 import fs from "fs";
 import { DeployFunction } from "hardhat-deploy/types";
 

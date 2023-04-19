@@ -64,7 +64,7 @@ contract PetoInventoryContract is
 
     //Functions-------------------------------------------
 
-    function safeMint(address to) public onlyOwner {
+    function mint(address to) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         createItem(uint32(tokenId), to);
         _tokenIdCounter.increment();
@@ -76,9 +76,9 @@ contract PetoInventoryContract is
         _burn(tokenId);
     }
 
-    function safeMintBatch(address[] calldata addresses) public onlyOwner {
+    function mintBatch(address[] calldata addresses) public onlyOwner {
         for (uint32 i = 0; i < addresses.length; i++) {
-            safeMint(addresses[i]);
+            mint(addresses[i]);
         }
     }
 
@@ -88,7 +88,7 @@ contract PetoInventoryContract is
 
     function createTokens(uint32 tokenCount) external onlyOwner {
         for (uint32 i = 0; i < tokenCount; i++) {
-            safeMint(_msgSender());
+            mint(_msgSender());
         }
     }
 

@@ -1,6 +1,6 @@
-import { signMessage } from "common";
-import { betSeedData } from "seeds";
-import { PetoBetContextBase } from "test";
+import { signMessage } from "@common";
+import { betSeedData } from "@seeds";
+import { PetoBetContextBase } from "@test";
 
 export async function signMessageForTransferEx(that: PetoBetContextBase, gameId?: string) {
   return signMessage(

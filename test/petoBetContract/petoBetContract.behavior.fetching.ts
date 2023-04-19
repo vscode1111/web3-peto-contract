@@ -1,5 +1,5 @@
+import { betSeedData } from "@seeds";
 import { expect } from "chai";
-import { betSeedData } from "seeds";
 
 import { checkTotalBalance } from "./utils";
 
