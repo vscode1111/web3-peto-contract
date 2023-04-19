@@ -16,6 +16,7 @@ describe(PETO_INVENTORY_CONTRACT_NAME, function () {
       owner,
       user1,
       user2,
+      user3,
       ownerPetoInventoryContract,
       user1PetoInventoryContract: user1PetoInventorContract,
       user2PetoInventoryContract: user2PetoInventorContract,
@@ -23,6 +24,7 @@ describe(PETO_INVENTORY_CONTRACT_NAME, function () {
     this.owner = owner;
     this.user1 = user1;
     this.user2 = user2;
+    this.user3 = user3;
     this.ownerPetoInventoryContract = ownerPetoInventoryContract;
     this.user1PetoInventoryContract = user1PetoInventorContract;
     this.user2PetoInventoryContract = user2PetoInventorContract;

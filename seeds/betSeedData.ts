@@ -14,7 +14,7 @@ const feeBalance = toWei(2).div(PRICE_DIV);
 const gameId0 = uuidv4();
 const gameId1 = uuidv4();
 
-export const seedData = {
+export const betSeedData = {
   zero: toWei(0),
   zeroAddress: "0x0000000000000000000000000000000000000000",
   accountInitBalance,

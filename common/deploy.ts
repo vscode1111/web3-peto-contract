@@ -70,15 +70,15 @@ export async function callWithTimerHre(
   console.log(finishMessage);
 }
 
+export async function delay(ms: number): Promise<number> {
+  return new Promise((resolve: any) => setTimeout(resolve, ms));
+}
+
 // https://github.com/astra-net/astra-scan.backend/blob/8f9618d8d4df0976b5544b75ed5636b2ef949acd/src/indexer/rpc/transport/ws/WebSocketRPC.ts
 export function timeoutPromise(callTimeout: number) {
   return new Promise((_, reject) =>
     setTimeout(() => reject(new Error(`Timeout error in ${callTimeout}ms`)), callTimeout),
   );
-}
-
-export async function delay(ms: number): Promise<number> {
-  return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
 
 export async function verifyContract(
@@ -156,7 +156,11 @@ export async function waitTx(
 
       if (functionName && receipt) {
         const gas = receipt.gasUsed;
-        const price = toNumber(gas.mul(receipt.effectiveGasPrice));
+        const price = toNumber(
+          receipt.effectiveGasPrice
+            ? gas.mul(receipt.effectiveGasPrice)
+            : receipt.cumulativeGasUsed,
+        );
         console.log(
           `TX: ${functionName} time: ${time.toFixed(1)} sec, gas: ${gas}, fee: ${price.toFixed(
             FRACTION_DIGITS,

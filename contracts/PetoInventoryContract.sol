@@ -35,7 +35,7 @@ contract PetoInventoryContract is
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-    //--------------------------------------------------
+    //Variables, structs, modifiers, events------------------------
 
     CountersUpgradeable.Counter private _tokenIdCounter;
 
@@ -46,7 +46,23 @@ contract PetoInventoryContract is
     struct TokenItem {
         uint32 tokenId;
         address owner;
+        bool transferable;
+        bool transfered;
     }
+
+    modifier onlyExists(uint32 tokenId) {
+        TokenItem memory token = fetchToken(tokenId);
+        require(token.owner != address(0), "This token was burnt");
+        _;
+    }
+
+    modifier onlyTransferableToken(uint32 tokenId) {
+        TokenItem memory token = fetchToken(tokenId);
+        require(token.transferable, "Token must be transferable");
+        _;
+    }
+
+    //Functions-------------------------------------------
 
     function safeMint(address to) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
@@ -55,8 +71,19 @@ contract PetoInventoryContract is
         _safeMint(to, tokenId);
     }
 
+    function burn(uint32 tokenId) public onlyOwner onlyExists(tokenId) {
+        _transferToken(uint32(tokenId), address(0));
+        _burn(tokenId);
+    }
+
+    function safeMintBatch(address[] calldata addresses) public onlyOwner {
+        for (uint32 i = 0; i < addresses.length; i++) {
+            safeMint(addresses[i]);
+        }
+    }
+
     function createItem(uint32 tokenId, address owner_) private onlyOwner {
-        _tokenItems[tokenId] = TokenItem(tokenId, owner_);
+        _tokenItems[tokenId] = TokenItem(tokenId, owner_, true, false);
     }
 
     function createTokens(uint32 tokenCount) external onlyOwner {
@@ -82,20 +109,29 @@ contract PetoInventoryContract is
         return uint32(_tokenIdCounter.current());
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public virtual override {
-        TokenItem storage token = _tokenItems[uint32(tokenId)];
+    function _transferToken(uint32 tokenId, address to) private returns (TokenItem memory) {
+        TokenItem storage token = _tokenItems[tokenId];
         token.owner = to;
-        super.safeTransferFrom(from, to, tokenId);
+        token.transfered = true;
+        return token;
     }
+
+    // function safeTransferFrom(
+    //     address from,
+    //     address to,
+    //     uint256 tokenId
+    // ) public virtual override onlyTransferableToken(uint32(tokenId)) {
+    //     console.log(111, "safeTransferFrom");
+    //     super.safeTransferFrom(from, to, tokenId);
+    // }
 
     function safeTransferFrom(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
-    ) public virtual override {
-        TokenItem storage token = _tokenItems[uint32(tokenId)];
-        token.owner = to;
+    ) public virtual override onlyTransferableToken(uint32(tokenId)) onlyExists(uint32(tokenId)) {
+        _transferToken(uint32(tokenId), to);
         super.safeTransferFrom(from, to, tokenId, data);
     }
 
@@ -109,5 +145,14 @@ contract PetoInventoryContract is
 
     function contractURI() public view returns (string memory) {
         return string.concat(_uri, "contract.json");
+    }
+
+    function updateToken(
+        uint32 tokenId,
+        bool transferable
+    ) external onlyOwner returns (TokenItem memory) {
+        TokenItem storage token = _tokenItems[tokenId];
+        token.transferable = transferable;
+        return token;
     }
 }

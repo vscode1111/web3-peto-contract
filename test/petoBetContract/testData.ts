@@ -1,4 +1,4 @@
-export const errorMessage = {
+export const betErrorMessage = {
   insufficentFunds: "Insufficent funds",
   lockedFundsFromAccount:
     "Locked funds of FROM account must be equal to or greater than the amount",

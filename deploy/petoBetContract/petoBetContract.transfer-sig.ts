@@ -2,7 +2,7 @@ import { callWithTimerHre, toNumber, waitTx } from "common";
 import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { seedData } from "seeds";
+import { betSeedData } from "seeds";
 import { getAddressesFromHre, getPetoBetContext, getUsers, signMessageForTransferEx } from "utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
@@ -17,14 +17,14 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     const petoBetContext = await getPetoBetContext(users, petoBetAddress);
     const { user2PetoBetContract } = petoBetContext;
 
-    const signature = await signMessageForTransferEx(petoBetContext, seedData.gameIdForce);
+    const signature = await signMessageForTransferEx(petoBetContext, betSeedData.gameIdForce);
     // const signature = seedData.signatureForce;
 
     console.table({
       from: user1.address,
       to: user2.address,
-      gameId: seedData.gameIdForce,
-      feeRate: toNumber(seedData.feeRate),
+      gameId: betSeedData.gameIdForce,
+      feeRate: toNumber(betSeedData.feeRate),
       signature,
     });
 
@@ -32,8 +32,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
       user2PetoBetContract.transferSig(
         user1.address,
         user2.address,
-        seedData.gameIdForce,
-        seedData.feeRate,
+        betSeedData.gameIdForce,
+        betSeedData.feeRate,
         signature,
       ),
       `transferSig`,

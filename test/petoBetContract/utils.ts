@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import _ from "lodash";
-import { seedData } from "seeds";
+import { betSeedData } from "seeds";
 import { v4 as uuidv4 } from "uuid";
 
 import { PetoBetContextBase } from "./types";
@@ -12,13 +12,13 @@ export interface BalanceObject {
 
 export async function getTotalBalance(objects: BalanceObject[]): Promise<BigNumber> {
   const result = await Promise.all(objects.map((obj) => obj.getBalance()));
-  return result.reduce((acc, cur) => acc.add(cur), seedData.zero);
+  return result.reduce((acc, cur) => acc.add(cur), betSeedData.zero);
 }
 
 export async function checkTotalBalance(that: PetoBetContextBase) {
   expect(
     await getTotalBalance([that.user1, that.user2, that.owner, that.ownerPetoBetContract]),
-  ).closeTo(seedData.totalAccountBalance, seedData.error);
+  ).closeTo(betSeedData.totalAccountBalance, betSeedData.error);
 }
 
 export async function checkTransfer(that: PetoBetContextBase, iterationNumber: number) {
@@ -28,26 +28,26 @@ export async function checkTransfer(that: PetoBetContextBase, iterationNumber: n
     that.user1.address,
     that.user2.address,
     gameId,
-    seedData.lock,
+    betSeedData.lock,
   );
 
   await that.ownerPetoBetContract.transfer(
     that.user1.address,
     that.user2.address,
     gameId,
-    seedData.feeRate,
+    betSeedData.feeRate,
   );
 
   expect(await that.user1.getBalance()).closeTo(
-    seedData.accountInitBalance.sub(seedData.deposit1),
-    seedData.error,
+    betSeedData.accountInitBalance.sub(betSeedData.deposit1),
+    betSeedData.error,
   );
   expect(await that.user2.getBalance()).closeTo(
-    seedData.accountInitBalance.sub(seedData.deposit2),
-    seedData.error,
+    betSeedData.accountInitBalance.sub(betSeedData.deposit2),
+    betSeedData.error,
   );
-  expect(await that.ownerPetoBetContract.getFeeBalance()).equal(
-    seedData.feeBalance.mul(iterationNumber),
+  expect(await that.ownerPetoBetContract.getFeeBalance()).eq(
+    betSeedData.feeBalance.mul(iterationNumber),
   );
-  expect(await that.ownerPetoBetContract.getBalance()).equal(seedData.deposit12);
+  expect(await that.ownerPetoBetContract.getBalance()).eq(betSeedData.deposit12);
 }
