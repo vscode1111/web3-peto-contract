@@ -1,5 +1,7 @@
 import { JsonMetadata } from "@common";
 
+export const verifyRequired = false;
+
 export const deployData = {
   name: "Name_b02",
   symbol: "Symbol_b02",

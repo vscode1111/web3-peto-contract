@@ -4,7 +4,7 @@ import { getPetoInventoryContext, getUsers } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { deployData } from "./deployData";
+import { deployData, verifyRequired } from "./deployData";
 
 const IS_OWNER_DEPLOY = true;
 
@@ -28,10 +28,13 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
     console.log(
       `${PETO_INVENTORY_CONTRACT_NAME} deployed to ${ownerPetoInventoryContract.address}`,
     );
-    await verifyContract(ownerPetoInventoryContract.address, hre);
-    console.log(
-      `${PETO_INVENTORY_CONTRACT_NAME} deployed and verified to ${ownerPetoInventoryContract.address}`,
-    );
+
+    if (verifyRequired) {
+      await verifyContract(ownerPetoInventoryContract.address, hre);
+      console.log(
+        `${PETO_INVENTORY_CONTRACT_NAME} deployed and verified to ${ownerPetoInventoryContract.address}`,
+      );
+    }
   }, hre);
 };
 

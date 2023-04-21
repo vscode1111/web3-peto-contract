@@ -4,6 +4,8 @@ export interface DeployNetworks {
   polygon: string;
   opera: string;
   bsc: string;
+  okc: string;
+  kcc: string;
 }
 
 export interface Addresses {

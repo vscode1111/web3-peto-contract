@@ -5,6 +5,8 @@ import { upgrades } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
+import { verifyRequired } from "./deployData";
+
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
     const { petoInventoryAddress } = await getAddressesFromHre(hre);
@@ -17,8 +19,11 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
 
     await upgrades.upgradeProxy(petoInventoryAddress, petoInventoryFactory);
     console.log(`${PETO_INVENTORY_CONTRACT_NAME} ${petoInventoryAddress} was upgraded`);
-    await verifyContract(petoInventoryAddress, hre);
-    console.log(`${petoInventoryAddress} upgraded and verified to ${petoInventoryAddress}`);
+
+    if (verifyRequired) {
+      await verifyContract(petoInventoryAddress, hre);
+      console.log(`${petoInventoryAddress} upgraded and verified to ${petoInventoryAddress}`);
+    }
   }, hre);
 };
 

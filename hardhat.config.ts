@@ -16,8 +16,12 @@ dotenvConfig({
   path: resolve(__dirname, dotenvConfigPath),
 });
 
-function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?: string } {
+function getChainConfig(
+  chain: keyof DeployNetworks,
+  chainId?: number,
+): NetworkUserConfig & { url?: string } {
   return {
+    chainId,
     url: getEnv(`${chain.toUpperCase()}_PROVIDER_URL`),
     accounts: [
       `0x${getEnv("OWNER_PRIVATE_KEY")}`,
@@ -29,7 +33,8 @@ function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?
   };
 }
 
-const defaultNetwork: keyof DeployNetworks = "polygon";
+// export const defaultNetwork: keyof DeployNetworks = "polygon";
+export const defaultNetwork: keyof DeployNetworks = "kcc";
 
 const config: HardhatUserConfig = {
   defaultNetwork,
@@ -38,6 +43,8 @@ const config: HardhatUserConfig = {
       polygon: getEnv("POLYGON_SCAN_API_KEY"),
       opera: getEnv("OPERA_SCAN_API_KEY"),
       bsc: getEnv("BSC_SCAN_API_KEY"),
+      okc: getEnv("OKC_SCAN_API_KEY"),
+      kcc: getEnv("KCC_SCAN_API_KEY"),
     },
   },
   gasReporter: {
@@ -50,6 +57,8 @@ const config: HardhatUserConfig = {
     polygon: getChainConfig("polygon"),
     opera: getChainConfig("opera"),
     bsc: getChainConfig("bsc"),
+    okc: getChainConfig("okc", 66),
+    kcc: getChainConfig("kcc", 321),
   },
   paths: {
     artifacts: "./artifacts",

@@ -4,6 +4,8 @@ import { getPetoBetContext, getUsers } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
+import { verifyRequired } from "./deployData";
+
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
     console.log(`${PETO_BET_CONTRACT_NAME} proxy is deploying...`);
@@ -12,10 +14,13 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
 
     await ownerPetoBetContract.deployed();
     console.log(`${PETO_BET_CONTRACT_NAME} deployed to ${ownerPetoBetContract.address}`);
-    await verifyContract(ownerPetoBetContract.address, hre);
-    console.log(
-      `${PETO_BET_CONTRACT_NAME} deployed and verified to ${ownerPetoBetContract.address}`,
-    );
+
+    if (verifyRequired) {
+      await verifyContract(ownerPetoBetContract.address, hre);
+      console.log(
+        `${PETO_BET_CONTRACT_NAME} deployed and verified to ${ownerPetoBetContract.address}`,
+      );
+    }
   }, hre);
 };
 

@@ -1,9 +1,21 @@
 import { keccak256FromStr, toWei } from "@common";
+import { DeployNetworks } from "@types";
 import { BigNumber } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 
+import { defaultNetwork } from "../hardhat.config";
+
+const chainDiv: Record<keyof DeployNetworks, string> = {
+  polygon: "1000",
+  opera: "1000",
+  bsc: "100000",
+  okc: "100000",
+  kcc: "100000",
+};
+
 const PROD_DATA = false;
-const PRICE_DIV = BigNumber.from(PROD_DATA ? "1" : "1000");
+
+const PRICE_DIV = BigNumber.from(PROD_DATA ? "1" : chainDiv[defaultNetwork]);
 
 const accountInitBalance = toWei(10000);
 const deposit1 = toWei(100).div(PRICE_DIV);
