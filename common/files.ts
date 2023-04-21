@@ -93,9 +93,8 @@ export function getParentDirectory(targetFile: string) {
   return path.dirname(targetFile);
 }
 
-export function checkFilePath(filePath: string) {
-  const parentDirectory = getParentDirectory(filePath);
-  if (!existsSync(parentDirectory)) {
-    mkdirSync(parentDirectory, { recursive: true });
+export function checkFilePathSync(filePath: string) {
+  if (!existsSync(filePath)) {
+    mkdirSync(filePath, { recursive: true });
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "peto-contract",
   "description": "Solidity smart contracts for Peto MVP",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "clean": "shx rm -rf ./artifacts ./cache ./coverage ./typechain-types ./coverage.json && yarn typechain",
     "commit": "git-cz",
@@ -30,7 +30,8 @@
     "deploy:inv:upgrade": "hardhat deploy --tags PetoInventoryContract:upgrade",
     "deploy:inv:transfer": "hardhat deploy --tags PetoInventoryContract:transfer",
     "deploy:inv:fetch": "hardhat deploy --tags PetoInventoryContract:fetch",
-    "deploy:generate-metadata": "hardhat deploy --tags misc:generate-metadata",
+    "deploy:inv:update-token": "hardhat deploy --tags PetoInventoryContract:update-token",
+    "deploy:inv:generate-metadata": "hardhat deploy --tags PetoInventoryContract:generate-metadata",
     "lint": "yarn lint:sol && yarn lint:ts && yarn prettier:check",
     "lint:sol": "solhint --config ./.solhint.json --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:ts": "eslint --config ./.eslintrc.yml --ignore-path ./.eslintignore --ext .js,.ts .",

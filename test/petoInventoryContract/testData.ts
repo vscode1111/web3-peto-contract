@@ -8,4 +8,5 @@ export const invTestData = {
 export const invErrorMessage = {
   tokenMustBeTransferable: "Token must be transferable",
   thisTokenWasBurnt: "This token was burnt",
+  callerIsNotTokenOwnerOrApproved: "ERC721: caller is not token owner or approved",
 };

@@ -24,6 +24,7 @@ function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?
       `0x${getEnv("USER1_PRIVATE_KEY")}`,
       `0x${getEnv("USER2_PRIVATE_KEY")}`,
       `0x${getEnv("USER3_PRIVATE_KEY")}`,
+      `0x${getEnv("SHOP_PRIVATE_KEY")}`,
     ],
   };
 }

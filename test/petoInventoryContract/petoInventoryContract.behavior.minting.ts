@@ -1,3 +1,4 @@
+import { INITIAL_POSITIVE_CHECK_TEST_TITLE } from "@common";
 import { initCollections } from "@test";
 import { invTestData } from "@test/petoInventoryContract/testData";
 import { expect } from "chai";
@@ -7,6 +8,9 @@ export function shouldBehaveCorrectMinting(): void {
     describe("setURI", () => {
       beforeEach(async function () {
         await this.ownerPetoInventoryContract.setURI(invTestData.uri);
+      });
+
+      it(INITIAL_POSITIVE_CHECK_TEST_TITLE, async function () {
         expect(await this.ownerPetoInventoryContract.contractURI()).eq(
           `${invTestData.uri}contract.json`,
         );

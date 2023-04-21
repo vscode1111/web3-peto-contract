@@ -16,4 +16,5 @@ export interface Users {
   user1: SignerWithAddress;
   user2: SignerWithAddress;
   user3: SignerWithAddress;
+  shop: SignerWithAddress;
 }

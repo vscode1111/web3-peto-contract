@@ -30,12 +30,13 @@ export function getAddressesFromHre(hre: HardhatRuntimeEnvironment) {
 }
 
 export async function getUsers(): Promise<Users> {
-  const [owner, user1, user2, user3] = await ethers.getSigners();
+  const [owner, user1, user2, user3, shop] = await ethers.getSigners();
   return {
     owner,
     user1,
     user2,
     user3,
+    shop,
   };
 }
 
@@ -76,7 +77,7 @@ export async function getPetoInventoryContext(
   createObj: string | { name: string; symbol: string },
   ownerForce?: SignerWithAddress,
 ) {
-  const { owner, user1, user2 } = users;
+  const { owner, user1, user2, shop } = users;
 
   const petoInventoryFactory = <PetoInventoryContract__factory>(
     (await ethers.getContractFactory(PETO_INVENTORY_CONTRACT_NAME)).connect(ownerForce ?? owner)
@@ -101,11 +102,13 @@ export async function getPetoInventoryContext(
 
   const user1PetoInventoryContract = ownerPetoInventoryContract.connect(user1);
   const user2PetoInventoryContract = ownerPetoInventoryContract.connect(user2);
+  const shopPetoInventoryContract = ownerPetoInventoryContract.connect(shop);
 
   return {
     petoInventoryFactory,
     ownerPetoInventoryContract,
     user1PetoInventoryContract,
     user2PetoInventoryContract,
+    shopPetoInventoryContract,
   };
 }

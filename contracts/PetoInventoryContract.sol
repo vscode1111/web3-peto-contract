@@ -72,7 +72,7 @@ contract PetoInventoryContract is
     }
 
     function burn(uint32 tokenId) public onlyOwner onlyExists(tokenId) {
-        _transferToken(uint32(tokenId), address(0));
+        _transferToken(uint32(tokenId), address(0), false);
         _burn(tokenId);
     }
 
@@ -116,12 +116,33 @@ contract PetoInventoryContract is
         return token;
     }
 
+    function _transferToken(
+        uint32 tokenId,
+        address to,
+        bool transferable
+    ) private returns (TokenItem memory) {
+        TokenItem storage token = _tokenItems[tokenId];
+        token.owner = to;
+        token.transfered = true;
+        token.transferable = transferable;
+        return token;
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override onlyExists(uint32(tokenId)) onlyTransferableToken(uint32(tokenId)) {
+        _transferToken(uint32(tokenId), to);
+        super.transferFrom(from, to, tokenId);
+    }
+
     // function safeTransferFrom(
     //     address from,
     //     address to,
     //     uint256 tokenId
-    // ) public virtual override onlyTransferableToken(uint32(tokenId)) {
-    //     console.log(111, "safeTransferFrom");
+    // ) public virtual override onlyExists(uint32(tokenId)) onlyTransferableToken(uint32(tokenId)) {
+    //     _transferToken(uint32(tokenId), to);
     //     super.safeTransferFrom(from, to, tokenId);
     // }
 
@@ -130,7 +151,7 @@ contract PetoInventoryContract is
         address to,
         uint256 tokenId,
         bytes memory data
-    ) public virtual override onlyTransferableToken(uint32(tokenId)) onlyExists(uint32(tokenId)) {
+    ) public virtual override onlyExists(uint32(tokenId)) onlyTransferableToken(uint32(tokenId)) {
         _transferToken(uint32(tokenId), to);
         super.safeTransferFrom(from, to, tokenId, data);
     }

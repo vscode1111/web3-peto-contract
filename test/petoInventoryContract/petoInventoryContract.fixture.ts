@@ -6,11 +6,15 @@ import { PetoInventoryContextBase } from "./types";
 export async function deployPetoContractFixture(): Promise<PetoInventoryContextBase> {
   const users = await getUsers();
 
-  const { ownerPetoInventoryContract, user1PetoInventoryContract, user2PetoInventoryContract } =
-    await getPetoInventoryContext(users, {
-      name: deployData.name,
-      symbol: deployData.symbol,
-    });
+  const {
+    ownerPetoInventoryContract,
+    user1PetoInventoryContract,
+    user2PetoInventoryContract,
+    shopPetoInventoryContract,
+  } = await getPetoInventoryContext(users, {
+    name: deployData.name,
+    symbol: deployData.symbol,
+  });
 
   await ownerPetoInventoryContract.deployed();
 
@@ -19,5 +23,6 @@ export async function deployPetoContractFixture(): Promise<PetoInventoryContextB
     ownerPetoInventoryContract,
     user1PetoInventoryContract,
     user2PetoInventoryContract,
+    shopPetoInventoryContract,
   };
 }

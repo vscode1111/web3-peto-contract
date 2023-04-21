@@ -6,6 +6,7 @@ export interface PetoInventoryContextBase extends Users {
   ownerPetoInventoryContract: PetoInventoryContract;
   user1PetoInventoryContract: PetoInventoryContract;
   user2PetoInventoryContract: PetoInventoryContract;
+  shopPetoInventoryContract: PetoInventoryContract;
 }
 
 declare module "mocha" {

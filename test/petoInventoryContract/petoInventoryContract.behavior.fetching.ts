@@ -5,9 +5,15 @@ import { expect } from "chai";
 
 export function shouldBehaveCorrectFetching(): void {
   describe("fetching", () => {
-    it("should return correct name and symbol", async function () {
+    it("should return correct initial state", async function () {
       expect(await this.ownerPetoInventoryContract.name()).eq(deployData.name);
       expect(await this.ownerPetoInventoryContract.symbol()).eq(deployData.symbol);
+      expect(
+        await this.ownerPetoInventoryContract.isApprovedForAll(
+          this.owner.address,
+          this.shop.address,
+        ),
+      ).eq(false);
     });
 
     describe("initCollectionsReal", () => {
