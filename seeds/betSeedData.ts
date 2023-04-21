@@ -1,4 +1,4 @@
-import { keccak256FromStr, toWei } from "common";
+import { keccak256FromStr, toWei } from "@common";
 import { BigNumber } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 
@@ -14,7 +14,7 @@ const feeBalance = toWei(2).div(PRICE_DIV);
 const gameId0 = uuidv4();
 const gameId1 = uuidv4();
 
-export const seedData = {
+export const betSeedData = {
   zero: toWei(0),
   zeroAddress: "0x0000000000000000000000000000000000000000",
   accountInitBalance,

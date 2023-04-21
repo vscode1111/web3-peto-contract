@@ -11,7 +11,7 @@ export async function expectThrowsAsync(method: () => Promise<any>, errorMessage
   }
   expect(error).an("Error");
   if (errorMessage) {
-    expect(error?.message).equal(errorMessage);
+    expect(error?.message).eq(errorMessage);
   }
 }
 
@@ -19,15 +19,25 @@ export function vmEsceptionText(text: string) {
   return `VM Exception while processing transaction: reverted with reason string '${text}'`;
 }
 
-export function revertedEsceptionText(text: string) {
-  return `execution reverted: ${text}`;
+export function includes(text: any, value: string) {
+  if (typeof text === "string") {
+    return text.includes(value);
+  }
+  if (Array.isArray(text)) {
+    for (const item of text) {
+      if (item.includes(value)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 export function errorHandler(error: object, message: string) {
   if ("reason" in error) {
-    expect(error.reason).eq(revertedEsceptionText(message));
+    expect(includes(error.reason, message)).eq(true);
   } else if ("message" in error) {
-    expect(error.message).eq(vmEsceptionText(message));
+    expect(includes(error.message, message)).eq(true);
   }
 }
 

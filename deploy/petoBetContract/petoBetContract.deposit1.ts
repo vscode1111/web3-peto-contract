@@ -1,9 +1,9 @@
-import { callWithTimerHre, waitTx } from "common";
-import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
+import { callWithTimerHre, waitTx } from "@common";
+import { PETO_BET_CONTRACT_NAME } from "@constants";
+import { betSeedData } from "@seeds";
+import { getAddressesFromHre, getPetoBetContext, getUsers } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { seedData } from "seeds";
-import { getAddressesFromHre, getPetoBetContext, getUsers } from "utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   await callWithTimerHre(async () => {
@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<voi
 
     await waitTx(
       user1PetoBetContract.deposit({
-        value: seedData.deposit1,
+        value: betSeedData.deposit1,
       }),
       `deposit1`,
     );

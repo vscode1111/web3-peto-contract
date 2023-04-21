@@ -1,16 +1,16 @@
-import { expect } from "chai";
-import { attempt, getNow, waitTx } from "common";
-import { printUserBalance } from "deploy/petoBetContract/utils";
-import { BigNumber } from "ethers";
-import { seedData } from "seeds";
+import { attempt, getNow, waitTx } from "@common";
+import { printUserBalance } from "@deploy/petoBetContract/utils";
+import { betSeedData } from "@seeds";
 import {
   DepositEvent,
   PairLockEvent,
   TransferEvent,
   WithdrawEvent,
   WithdrawFeeEvent,
-} from "typechain-types/contracts/PetoBetContract";
-import { signMessageForTransferEx } from "utils";
+} from "@typechain-types/contracts/PetoBetContract";
+import { signMessageForTransferEx } from "@utils";
+import { expect } from "chai";
+import { BigNumber } from "ethers";
 
 import { EvenName, PetoBetContextBase } from "./types";
 import { BalanceObject, getTotalBalance } from "./utils";
@@ -20,11 +20,11 @@ export async function smokeTest(that: PetoBetContextBase) {
   const totalBalance = await getTotalBalance(accounts);
 
   const ownerInitBalance = await that.owner.getBalance();
-  expect(ownerInitBalance).greaterThan(seedData.zero);
+  expect(ownerInitBalance).greaterThan(betSeedData.zero);
   const user1InitBalance = await that.user1.getBalance();
-  expect(user1InitBalance).greaterThan(seedData.lock);
+  expect(user1InitBalance).greaterThan(betSeedData.lock);
   const user2InitBalance = await that.user2.getBalance();
-  expect(user2InitBalance).greaterThan(seedData.lock);
+  expect(user2InitBalance).greaterThan(betSeedData.lock);
 
   await user1DepositesTokens(that);
   await user2DepositesTokens(that);
@@ -38,7 +38,7 @@ export async function smokeTest(that: PetoBetContextBase) {
   await user1WithdrawsTokens(that, user1InitBalance);
   await user2WithdrawsTokens(that, user2InitBalance);
 
-  expect(await getTotalBalance(accounts)).closeTo(totalBalance, seedData.bigError);
+  expect(await getTotalBalance(accounts)).closeTo(totalBalance, betSeedData.bigError);
 }
 
 const labels = {
@@ -59,36 +59,36 @@ export async function user1DepositesTokens(that: PetoBetContextBase) {
   console.log(labels.user1DepositesTokens);
 
   const receipt = await waitTx(
-    that.user1PetoBetContract.deposit({ value: seedData.deposit1 }),
+    that.user1PetoBetContract.deposit({ value: betSeedData.deposit1 }),
     "deposit",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.Deposit) as DepositEvent;
   expect(event).not.undefined;
   const { account, amount, timestamp } = event?.args;
-  expect(account).equal(that.user1.address);
-  expect(amount).equal(seedData.deposit1);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(account).eq(that.user1.address);
+  expect(amount).eq(betSeedData.deposit1);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 }
 
 export async function user2DepositesTokens(that: PetoBetContextBase) {
   console.log(labels.user2DepositesTokens);
 
   const receipt = await waitTx(
-    that.user2PetoBetContract.deposit({ value: seedData.deposit2 }),
+    that.user2PetoBetContract.deposit({ value: betSeedData.deposit2 }),
     "deposit",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.Deposit) as DepositEvent;
   expect(event).not.undefined;
   const { account, amount, timestamp } = event?.args;
-  expect(account).equal(that.user2.address);
-  expect(amount).equal(seedData.deposit2);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(account).eq(that.user2.address);
+  expect(amount).eq(betSeedData.deposit2);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 }
 
 export async function checkUserBalances(that: PetoBetContextBase) {
@@ -98,43 +98,43 @@ export async function checkUserBalances(that: PetoBetContextBase) {
     async () => {
       const user1Balance = await that.user1PetoBetContract.balanceOf(that.user1.address);
       printUserBalance(user1Balance, "user1");
-      expect(user1Balance.free).greaterThanOrEqual(seedData.deposit1);
-      expect(user1Balance.locked).greaterThanOrEqual(seedData.zero);
+      expect(user1Balance.free).greaterThanOrEqual(betSeedData.deposit1);
+      expect(user1Balance.locked).greaterThanOrEqual(betSeedData.zero);
 
       const user2Balance = await that.user1PetoBetContract.balanceOf(that.user2.address);
       printUserBalance(user2Balance, "user2");
-      expect(user2Balance.free).greaterThanOrEqual(seedData.deposit1);
-      expect(user2Balance.locked).greaterThanOrEqual(seedData.zero);
+      expect(user2Balance.free).greaterThanOrEqual(betSeedData.deposit1);
+      expect(user2Balance.locked).greaterThanOrEqual(betSeedData.zero);
     },
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 }
 
 export async function ownerPairLockTokens(that: PetoBetContextBase) {
   console.log(labels.ownerPairLocksTokens);
-  console.log(`gameId: ${seedData.gameId0}`);
+  console.log(`gameId: ${betSeedData.gameId0}`);
 
   const receipt = await waitTx(
     that.ownerPetoBetContract.pairLock(
       that.user1.address,
       that.user2.address,
-      seedData.gameId0,
-      seedData.lock,
+      betSeedData.gameId0,
+      betSeedData.lock,
     ),
     "pairLock",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.PairLock) as PairLockEvent;
   expect(event).not.undefined;
   const { account1, account2, gameIdHash, amount, timestamp } = event?.args;
-  expect(account1).equal(that.user1.address);
-  expect(account2).equal(that.user2.address);
-  expect(gameIdHash).equal(seedData.gameIdHash0);
-  expect(amount).equal(seedData.lock);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(account1).eq(that.user1.address);
+  expect(account2).eq(that.user2.address);
+  expect(gameIdHash).eq(betSeedData.gameIdHash0);
+  expect(amount).eq(betSeedData.lock);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 }
 
 export async function checkGameItem(that: PetoBetContextBase) {
@@ -142,7 +142,7 @@ export async function checkGameItem(that: PetoBetContextBase) {
 
   await attempt(
     async () => {
-      const [, gameItem] = await that.user1PetoBetContract.getGameItem(seedData.gameId0);
+      const [, gameItem] = await that.user1PetoBetContract.getGameItem(betSeedData.gameId0);
       const { account1, account2, amount, transfered } = gameItem;
 
       console.table({
@@ -152,46 +152,46 @@ export async function checkGameItem(that: PetoBetContextBase) {
         transfered,
       });
 
-      expect(account1).not.eq(seedData.zeroAddress);
-      expect(account2).not.eq(seedData.zeroAddress);
-      expect(amount).greaterThanOrEqual(seedData.zero);
+      expect(account1).not.eq(betSeedData.zeroAddress);
+      expect(account2).not.eq(betSeedData.zeroAddress);
+      expect(amount).greaterThanOrEqual(betSeedData.zero);
       expect(transfered).eq(false);
     },
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 }
 
 export async function ownerTransfersTokens(that: PetoBetContextBase) {
   console.log(labels.ownerTranfersTokens);
-  console.log(`gameId: ${seedData.gameId0}`);
+  console.log(`gameId: ${betSeedData.gameId0}`);
 
   const receipt = await waitTx(
     that.ownerPetoBetContract.transfer(
       that.user1.address,
       that.user2.address,
-      seedData.gameId0,
-      seedData.feeRate,
+      betSeedData.gameId0,
+      betSeedData.feeRate,
     ),
     "transfer",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.Transfer) as TransferEvent;
   expect(event).not.undefined;
   const { from, to, gameIdHash, amount, feeRate, timestamp } = event?.args;
-  expect(from).equal(that.user1.address);
-  expect(to).equal(that.user2.address);
-  expect(gameIdHash).equal(seedData.gameIdHash0);
-  expect(amount).equal(seedData.lock);
-  expect(feeRate).equal(seedData.feeRate);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(from).eq(that.user1.address);
+  expect(to).eq(that.user2.address);
+  expect(gameIdHash).eq(betSeedData.gameIdHash0);
+  expect(amount).eq(betSeedData.lock);
+  expect(feeRate).eq(betSeedData.feeRate);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 }
 
 export async function user2TransfersSigTokens(that: PetoBetContextBase) {
   console.log(labels.user2TranfersSigTokens);
-  console.log(`gameId: ${seedData.gameId0}`);
+  console.log(`gameId: ${betSeedData.gameId0}`);
 
   const signature = await signMessageForTransferEx(that);
   console.log(`signature: ${signature}`);
@@ -200,24 +200,24 @@ export async function user2TransfersSigTokens(that: PetoBetContextBase) {
     that.user2PetoBetContract.transferSig(
       that.user1.address,
       that.user2.address,
-      seedData.gameId0,
-      seedData.feeRate,
+      betSeedData.gameId0,
+      betSeedData.feeRate,
       signature,
     ),
     "transferSig",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.Transfer) as TransferEvent;
   expect(event).not.undefined;
   const { from, to, gameIdHash, amount, feeRate, timestamp } = event?.args;
-  expect(from).equal(that.user1.address);
-  expect(to).equal(that.user2.address);
-  expect(gameIdHash).equal(seedData.gameIdHash0);
-  expect(amount).equal(seedData.lock);
-  expect(feeRate).equal(seedData.feeRate);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(from).eq(that.user1.address);
+  expect(to).eq(that.user2.address);
+  expect(gameIdHash).eq(betSeedData.gameIdHash0);
+  expect(amount).eq(betSeedData.lock);
+  expect(feeRate).eq(betSeedData.feeRate);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 }
 
 export async function ownerWithdrawsFeeTokens(
@@ -227,10 +227,10 @@ export async function ownerWithdrawsFeeTokens(
   console.log(labels.ownerWithdrawsFeeTokens);
 
   const receipt = await waitTx(
-    that.ownerPetoBetContract.withdrawFee(that.owner.address, seedData.feeBalance),
+    that.ownerPetoBetContract.withdrawFee(that.owner.address, betSeedData.feeBalance),
     "withdrawFee",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find(
@@ -238,13 +238,13 @@ export async function ownerWithdrawsFeeTokens(
   ) as WithdrawFeeEvent;
   expect(event).not.undefined;
   const { account, amount, timestamp } = event?.args;
-  expect(account).equal(that.owner.address);
-  expect(amount).equal(seedData.feeBalance);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(account).eq(that.owner.address);
+  expect(amount).eq(betSeedData.feeBalance);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 
   expect(await that.owner.getBalance()).closeTo(
-    ownerInitBalance.add(seedData.feeBalance),
-    seedData.bigError,
+    ownerInitBalance.add(betSeedData.feeBalance),
+    betSeedData.bigError,
   );
 }
 
@@ -252,22 +252,22 @@ export async function user1WithdrawsTokens(that: PetoBetContextBase, user1InitBa
   console.log(labels.user1WithdrawsTokens);
 
   const receipt = await waitTx(
-    that.user1PetoBetContract.withdraw(seedData.remains1),
+    that.user1PetoBetContract.withdraw(betSeedData.remains1),
     "withdraw",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.Withdraw) as WithdrawEvent;
   expect(event).not.undefined;
   const { account, amount, timestamp } = event?.args;
-  expect(account).equal(that.user1.address);
-  expect(amount).equal(seedData.remains1);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(account).eq(that.user1.address);
+  expect(amount).eq(betSeedData.remains1);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 
   expect(await that.user1.getBalance()).closeTo(
-    user1InitBalance.sub(seedData.deposit1).add(seedData.remains1),
-    seedData.bigError,
+    user1InitBalance.sub(betSeedData.deposit1).add(betSeedData.remains1),
+    betSeedData.bigError,
   );
 }
 
@@ -275,22 +275,22 @@ export async function user2WithdrawsTokens(that: PetoBetContextBase, user2InitBa
   console.log(labels.user2WithdrawsTokens);
 
   const receipt = await waitTx(
-    that.user2PetoBetContract.withdraw(seedData.deposit2Win),
+    that.user2PetoBetContract.withdraw(betSeedData.deposit2Win),
     "withdraw",
-    seedData.attemps,
-    seedData.delayMs,
+    betSeedData.attemps,
+    betSeedData.delayMs,
   );
 
   const event = receipt.events?.find((item) => item.event === EvenName.Withdraw) as WithdrawEvent;
   expect(event).not.undefined;
   const { account, amount, timestamp } = event?.args;
-  expect(account).equal(that.user2.address);
-  expect(amount).equal(seedData.deposit2Win);
-  expect(timestamp).closeTo(getNow(), seedData.timeDelta);
+  expect(account).eq(that.user2.address);
+  expect(amount).eq(betSeedData.deposit2Win);
+  expect(timestamp).closeTo(getNow(), betSeedData.timeDelta);
 
   expect(await that.user2.getBalance()).closeTo(
-    user2InitBalance.add(seedData.win),
-    seedData.bigError,
+    user2InitBalance.add(betSeedData.win),
+    betSeedData.bigError,
   );
 }
 

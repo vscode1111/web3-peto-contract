@@ -1,16 +1,16 @@
-import { StringNumber } from "common";
-import { PetoInventoryContract } from "typechain-types/contracts/PetoInventoryContract";
+import { StringNumber } from "@common";
+import { PetoInventoryContract } from "@typechain-types/contracts/PetoInventoryContract";
 
-import { testData } from "./petoInventoryContract/testData";
+import { invTestData } from "./petoInventoryContract/testData";
 
 export function getCollectionName(name: StringNumber) {
   return `collection ${name}`;
 }
 
-export async function initCollectionsReal(
+export async function initCollections(
   petoInventoryContract: PetoInventoryContract,
-  tokenCount = testData.tokenCount,
+  tokenCount = invTestData.tokenCount,
 ) {
-  await petoInventoryContract.setURI(testData.uri);
+  await petoInventoryContract.setURI(invTestData.uri);
   await petoInventoryContract.createTokens(tokenCount);
 }

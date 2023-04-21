@@ -1,13 +1,13 @@
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
+import { DeployNetworks } from "@types";
 import { config as dotenvConfig } from "dotenv";
 import "hardhat-deploy";
 import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import "tsconfig-paths/register";
-import { DeployNetworks } from "types";
 
 import { getEnv } from "./common/config";
 
@@ -24,6 +24,7 @@ function getChainConfig(chain: keyof DeployNetworks): NetworkUserConfig & { url?
       `0x${getEnv("USER1_PRIVATE_KEY")}`,
       `0x${getEnv("USER2_PRIVATE_KEY")}`,
       `0x${getEnv("USER3_PRIVATE_KEY")}`,
+      `0x${getEnv("SHOP_PRIVATE_KEY")}`,
     ],
   };
 }

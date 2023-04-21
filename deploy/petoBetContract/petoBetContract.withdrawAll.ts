@@ -1,8 +1,8 @@
-import { callWithTimerHre, waitTx } from "common";
-import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
+import { callWithTimerHre, waitTx } from "@common";
+import { PETO_BET_CONTRACT_NAME } from "@constants";
+import { getAddressesFromHre, getPetoBetContext, getUsers } from "@utils";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { getAddressesFromHre, getPetoBetContext, getUsers } from "utils";
 
 import { printFeeBalance, printUserBalance } from "./utils";
 

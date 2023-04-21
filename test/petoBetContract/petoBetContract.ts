@@ -1,5 +1,5 @@
+import { PETO_BET_CONTRACT_NAME } from "@constants";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { PETO_BET_CONTRACT_NAME } from "constants/addresses";
 
 import { shouldBehaveCorrectFetching } from "./petoBetContract.behavior.fetching";
 import { shouldBehaveCorrectFunding } from "./petoBetContract.behavior.funding";

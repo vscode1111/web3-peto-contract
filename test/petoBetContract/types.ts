@@ -1,7 +1,7 @@
-import { Fixture } from "test/types";
-import { PetoBetContract } from "typechain-types/contracts/PetoBetContract";
-import { PetoBetContract__factory } from "typechain-types/factories/contracts/PetoBetContract__factory";
-import { Users } from "types";
+import { Fixture } from "@test";
+import { PetoBetContract } from "@typechain-types/contracts/PetoBetContract";
+import { PetoBetContract__factory } from "@typechain-types/factories/contracts/PetoBetContract__factory";
+import { Users } from "@types";
 
 export interface PetoBetContextBase extends Users {
   petoBetFactory: PetoBetContract__factory;
