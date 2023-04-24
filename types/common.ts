@@ -2,7 +2,6 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 export interface DeployNetworks {
   polygon: string;
-  opera: string;
   bsc: string;
   okc: string;
   kcc: string;

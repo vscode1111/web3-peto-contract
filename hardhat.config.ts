@@ -41,7 +41,6 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       polygon: getEnv("POLYGON_SCAN_API_KEY"),
-      opera: getEnv("OPERA_SCAN_API_KEY"),
       bsc: getEnv("BSC_SCAN_API_KEY"),
       okc: getEnv("OKC_SCAN_API_KEY"),
       kcc: getEnv("KCC_SCAN_API_KEY"),
@@ -55,7 +54,6 @@ const config: HardhatUserConfig = {
   },
   networks: {
     polygon: getChainConfig("polygon"),
-    opera: getChainConfig("opera"),
     bsc: getChainConfig("bsc"),
     okc: getChainConfig("okc", 66),
     kcc: getChainConfig("kcc", 321),

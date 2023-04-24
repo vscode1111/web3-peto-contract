@@ -7,7 +7,6 @@ import { defaultNetwork } from "../hardhat.config";
 
 const chainDiv: Record<keyof DeployNetworks, string> = {
   polygon: "1000",
-  opera: "1000",
   bsc: "100000",
   okc: "100000",
   kcc: "100000",
