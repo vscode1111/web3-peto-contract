@@ -296,7 +296,7 @@ export async function user2WithdrawsTokens(that: PetoBetContextBase, user2InitBa
 
 export function shouldBehaveCorrectSmokeTest(): void {
   describe("smoke test", () => {
-    it.only(labels.smokeTest, async function () {
+    it(labels.smokeTest, async function () {
       await smokeTest(this);
     });
   });
